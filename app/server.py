@@ -59,6 +59,15 @@ class GeminiSession:
         self.run_id = "n/a"
         self.user_id = "n/a"
         self.tool_functions = tool_functions
+        self._is_running = True
+
+    async def stop(self):
+        """Stop the session."""
+        self._is_running = False
+        try:
+            await self.session._ws.close()
+        except Exception as e:
+            logging.error(f"Error closing session: {e}")
 
     async def receive_from_client(self) -> None:
         """Listen for and process messages from the client.
@@ -66,9 +75,11 @@ class GeminiSession:
         Continuously receives messages and forwards audio data to Gemini.
         Handles connection errors gracefully.
         """
-        while True:
+        while self._is_running:
             try:
                 data = await self.websocket.receive_json()
+                if not self._is_running:
+                    break
                 if isinstance(data, dict) and (
                     "realtimeInput" in data or "clientContent" in data
                 ):
@@ -81,9 +92,11 @@ class GeminiSession:
                     logging.warning(f"Received unexpected input from client: {data}")
             except ConnectionClosedError as e:
                 logging.warning(f"Client {self.user_id} closed connection: {e}")
+                await self.stop()
                 break
             except Exception as e:
                 logging.error(f"Error receiving from client {self.user_id}: {str(e)}")
+                await self.stop()
                 break
 
     def _get_func(self, action_label: str) -> Optional[Callable]:
@@ -116,12 +129,20 @@ class GeminiSession:
         Continuously receives messages from Gemini, forwards them to the client,
         and handles any tool calls. Handles connection errors gracefully.
         """
-        while result := await self.session._ws.recv(decode=False):
-            await self.websocket.send_bytes(result)
-            message = types.LiveServerMessage.model_validate(json.loads(result))
-            if message.tool_call:
-                tool_call = LiveServerToolCall.model_validate(message.tool_call)
-                await self._handle_tool_call(self.session, tool_call)
+        while self._is_running:
+            try:
+                result = await self.session._ws.recv(decode=False)
+                if not result or not self._is_running:
+                    break
+                await self.websocket.send_bytes(result)
+                message = types.LiveServerMessage.model_validate(json.loads(result))
+                if message.tool_call:
+                    tool_call = LiveServerToolCall.model_validate(message.tool_call)
+                    await self._handle_tool_call(self.session, tool_call)
+            except Exception as e:
+                logging.error(f"Error receiving from Gemini: {e}")
+                await self.stop()
+                break
 
 
 def get_connect_and_run_callable(websocket: WebSocket) -> Callable:
@@ -135,14 +156,16 @@ def get_connect_and_run_callable(websocket: WebSocket) -> Callable:
     """
 
     async def on_backoff(details: backoff._typing.Details) -> None:
-        await websocket.send_json(
-            {
-                "status": f"Model connection error, retrying in {details['wait']} seconds..."
-            }
-        )
+        await websocket.send_json({
+            "status": f"Model connection error, retrying in {details['wait']} seconds..."
+        })
 
     @backoff.on_exception(
-        backoff.expo, ConnectionClosedError, max_tries=10, on_backoff=on_backoff
+        backoff.expo,
+        ConnectionClosedError,
+        max_tries=5,
+        max_time=30,
+        on_backoff=on_backoff
     )
     async def connect_and_run() -> None:
         async with genai_client.aio.live.connect(
@@ -164,9 +187,14 @@ def get_connect_and_run_callable(websocket: WebSocket) -> Callable:
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket) -> None:
     """Handle new websocket connections."""
-    await websocket.accept()
-    connect_and_run = get_connect_and_run_callable(websocket)
-    await connect_and_run()
+    gemini_session = None
+    try:
+        await websocket.accept()
+        connect_and_run = get_connect_and_run_callable(websocket)
+        await connect_and_run()
+    finally:
+        if gemini_session:
+            await gemini_session.stop()
 
 
 class Feedback(BaseModel):
