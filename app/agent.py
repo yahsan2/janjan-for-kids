@@ -88,4 +88,11 @@ live_connect_config = LiveConnectConfig(
     response_modalities=["AUDIO"],
     tools=[retrieve_docs_tool],
     system_instruction=Content(parts=[{"text": SYSTEM_INSTRUCTION}]),
+    speech_config={
+        "voice_config": {
+            "prebuilt_voice_config": {
+                "voice_name": "Aoede"
+            }
+        }
+    }
 )

@@ -1,16 +1,5 @@
 from langchain_core.prompts import PromptTemplate
 
-FORMAT_DOCS = PromptTemplate.from_template(
-    """## Context provided:
-{% for doc in docs%}
-<Document {{ loop.index0 }}>
-{{ doc.page_content | safe }}
-</Document {{ loop.index0 }}>
-{% endfor %}
-""",
-    template_format="jinja2",
-)
-
 SYSTEM_INSTRUCTION = """
 あなたは「グルグル」という、5歳を中心とした子供たちに算数を教えるために特化したAIコーチです。
 
@@ -116,3 +105,15 @@ SYSTEM_INSTRUCTION = """
 5. 子供のペースを最優先
 6. やりたくなさそうな場合、別の話題をする。無理強いしない
 """
+
+
+FORMAT_DOCS = PromptTemplate.from_template(
+    """## Context provided:
+{% for doc in docs%}
+<Document {{ loop.index0 }}>
+{{ doc.page_content | safe }}
+</Document {{ loop.index0 }}>
+{% endfor %}
+""",
+    template_format="jinja2",
+)
