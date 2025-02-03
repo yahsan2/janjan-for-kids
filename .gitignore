@@ -1,0 +1,15 @@
+node_modules
+dist
+.dev.vars
+.env
+.persist_vector_store
+.DS_Store
+
+server-build
+app/__pycache__
+
+# Change them to your taste:
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
