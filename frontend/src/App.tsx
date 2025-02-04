@@ -24,6 +24,7 @@ import { ExpressionProvider } from "./contexts/ExpressionContext";
 import { LiveAPIProvider } from "./contexts/LiveAPIContext";
 import { StreamingProvider } from "./contexts/StreamingContext";
 import { useConfig } from "./hooks/use-config";
+import { ModelContainer } from "./components/model-viewer-container";
 
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -41,6 +42,7 @@ function App() {
             <div className="streaming-console">
               <SidePanel />
               <main className="main-app-area">
+                <ModelContainer />
                 {isOpen && (
                   <WelcomeOverlay>
                     <button

@@ -4,7 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
-import type { ExpressionKey } from "../contexts/ExpressionContext";
+import { type ExpressionKey } from "../contexts/ExpressionContext";
 
 interface ModelViewerProps {
   className: string;
@@ -13,12 +13,13 @@ interface ModelViewerProps {
 
 export function ModelViewer({ className, expression }: ModelViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const modelRef = useRef<THREE.Group | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const controlsRef = useRef<OrbitControls | null>(null);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number>(null);
   const timeRef = useRef<number>(0);
   const isHappyRef = useRef<boolean>(false);
   const isSadRef = useRef<boolean>(false);
@@ -64,7 +65,7 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
 
   // シーンのセットアップ（初回のみ）
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !canvasRef.current) return;
 
     // シーン、カメラ、レンダラーを作成
     const scene = new THREE.Scene();
@@ -79,16 +80,18 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
     camera.position.set(0, 1, 2);
     cameraRef.current = camera;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvasRef.current,
+      antialias: true
+    });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1;
     rendererRef.current = renderer;
-    containerRef.current.appendChild(renderer.domElement);
 
     // OrbitControlsを追加
-    const controls = new OrbitControls(camera, renderer.domElement);
+    const controls = new OrbitControls(camera, canvasRef.current);
     controls.enableDamping = true; // スムーズな動きを有効化
     controls.dampingFactor = 0.05; // 減衰係数
     controls.minDistance = 1; // 最小ズーム距離
@@ -240,6 +243,8 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
   }, [expression, updateModelExpression]); // expressionが変更されたときのみ実行
 
   return (
-    <div className={className} ref={containerRef} style={{ width: "100%", height: "100vh" }} />
+    <div className={`${className} relative`} ref={containerRef}>
+      <canvas ref={canvasRef} />
+    </div>
   );
 }
