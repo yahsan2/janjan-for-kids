@@ -20,10 +20,10 @@ export function useConfig(): Config {
 
     if (process.env.NODE_ENV === 'development') {
       // 開発環境の場合、ローカルのバックエンドURLを使用
-      wsUrl = process.env.REACT_APP_BACKEND_URL || 'ws://localhost:8000/ws';
+      wsUrl = 'ws://localhost:8000/ws';
     } else {
       // 本番環境などの場合、プロダクション用のバックエンドURLを使用
-      wsUrl = process.env.REACT_APP_BACKEND_URL || 'wss://janjan-for-kids-pijxwapxwq-uc.a.run.app/ws';
+      wsUrl = 'wss://janjan-for-kids-pijxwapxwq-uc.a.run.app/ws';
     }
 
     return { wsUrl };
