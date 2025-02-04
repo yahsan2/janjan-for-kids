@@ -20,9 +20,7 @@ export type GetAudioContextOptions = AudioContextOptions & {
 
 const map: Map<string, AudioContext> = new Map();
 
-export const audioContext: (
-  options?: GetAudioContextOptions,
-) => Promise<AudioContext> = (() => {
+export const audioContext: (options?: GetAudioContextOptions) => Promise<AudioContext> = (() => {
   const didInteract = new Promise((res) => {
     window.addEventListener("pointerdown", res, { once: true });
     window.addEventListener("keydown", res, { once: true });

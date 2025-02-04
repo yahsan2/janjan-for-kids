@@ -27,15 +27,11 @@ export function useWebcam(): UseMediaStreamResult {
       setStream(null);
     };
     if (stream) {
-      stream
-        .getTracks()
-        .forEach((track) => track.addEventListener("ended", handleStreamEnded));
+      stream.getTracks().forEach((track) => track.addEventListener("ended", handleStreamEnded));
       return () => {
         stream
           .getTracks()
-          .forEach((track) =>
-            track.removeEventListener("ended", handleStreamEnded),
-          );
+          .forEach((track) => track.removeEventListener("ended", handleStreamEnded));
       };
     }
   }, [stream]);

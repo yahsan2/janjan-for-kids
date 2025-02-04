@@ -8,7 +8,7 @@
  *   を使用します。
  */
 
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
 interface Config {
   wsUrl: string;
@@ -18,12 +18,12 @@ export function useConfig(): Config {
   return useMemo(() => {
     let wsUrl: string;
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       // 開発環境の場合、ローカルのバックエンドURLを使用
-      wsUrl = 'ws://localhost:8000/ws';
+      wsUrl = "ws://localhost:8000/ws";
     } else {
       // 本番環境などの場合、プロダクション用のバックエンドURLを使用
-      wsUrl = 'wss://janjan-for-kids-pijxwapxwq-uc.a.run.app/ws';
+      wsUrl = "wss://janjan-for-kids-pijxwapxwq-uc.a.run.app/ws";
     }
 
     return { wsUrl };

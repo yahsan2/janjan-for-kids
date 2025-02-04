@@ -37,80 +37,80 @@ function App() {
     <div className="App">
       <ExpressionProvider>
         <StreamingProvider>
-        <LiveAPIProvider url={wsUrl} userId={userId}>
-          <div className="streaming-console">
-            <SidePanel />
-            <main className="main-app-area">
-                    {isOpen && <WelcomeOverlay>
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              始める
-            </button>
-          </WelcomeOverlay>
-                      }
-
+          <LiveAPIProvider url={wsUrl} userId={userId}>
+            <div className="streaming-console">
+              <SidePanel />
+              <main className="main-app-area">
+                {isOpen && (
+                  <WelcomeOverlay>
+                    <button
+                      type="button"
+                      onClick={() => setIsOpen(false)}
+                      className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      始める
+                    </button>
+                  </WelcomeOverlay>
+                )}
 
                 <div className="main-app-area">
                   <video
                     className={cn("stream", {
-                      hidden: !videoRef.current || !videoStream
+                      hidden: !videoRef.current || !videoStream,
                     })}
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                />
-              </div>
-              <ControlTray
-                videoRef={videoRef}
-                supportsVideo={true}
-                onVideoStreamChange={setVideoStream}
-              />
-              <div
-                className="url-setup"
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  pointerEvents: "auto",
-                  zIndex: 1000,
-                  padding: "2px",
-                  marginBottom: "2px",
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                  background: "rgba(255, 255, 255, 0.9)"
-                }}
-              >
-                <div>
-                  <label htmlFor="user-id">User ID:</label>
-                  <input
-                    id="user-id"
-                    type="text"
-                    value={userId}
-                    onChange={(e) => setUserId(e.target.value)}
-                    placeholder="Enter user ID"
-                    style={{
-                      cursor: "text",
-                      padding: "4px",
-                      margin: "0 4px",
-                      borderRadius: "2px",
-                      border: "1px solid #ccc",
-                      fontSize: "14px",
-                      fontFamily: "system-ui, -apple-system, sans-serif",
-                      width: "100px"
-                    }}
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
                   />
                 </div>
-              </div>
-            </main>
-          </div>
-        </LiveAPIProvider>
+                <ControlTray
+                  videoRef={videoRef}
+                  supportsVideo={true}
+                  onVideoStreamChange={setVideoStream}
+                />
+                <div
+                  className="url-setup"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    pointerEvents: "auto",
+                    zIndex: 1000,
+                    padding: "2px",
+                    marginBottom: "2px",
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    background: "rgba(255, 255, 255, 0.9)",
+                  }}
+                >
+                  <div>
+                    <label htmlFor="user-id">User ID:</label>
+                    <input
+                      id="user-id"
+                      type="text"
+                      value={userId}
+                      onChange={(e) => setUserId(e.target.value)}
+                      placeholder="Enter user ID"
+                      style={{
+                        cursor: "text",
+                        padding: "4px",
+                        margin: "0 4px",
+                        borderRadius: "2px",
+                        border: "1px solid #ccc",
+                        fontSize: "14px",
+                        fontFamily: "system-ui, -apple-system, sans-serif",
+                        width: "100px",
+                      }}
+                    />
+                  </div>
+                </div>
+              </main>
+            </div>
+          </LiveAPIProvider>
         </StreamingProvider>
-        </ExpressionProvider>
+      </ExpressionProvider>
     </div>
   );
 }

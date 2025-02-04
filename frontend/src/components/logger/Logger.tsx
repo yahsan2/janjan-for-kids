@@ -52,14 +52,10 @@ const LogEntry = ({
   }) => ReactNode;
 }): JSX.Element => (
   <li
-    className={cn(
-      `plain-log`,
-      `source-${log.type.slice(0, log.type.indexOf("."))}`,
-      {
-        receive: log.type.includes("receive"),
-        send: log.type.includes("send"),
-      },
-    )}
+    className={cn(`plain-log`, `source-${log.type.slice(0, log.type.indexOf("."))}`, {
+      receive: log.type.includes("receive"),
+      send: log.type.includes("send"),
+    })}
   >
     <span className="timestamp">{formatTime(log.date)}</span>
     <span className="source">{log.type}</span>
@@ -78,9 +74,7 @@ const PlainTextMessage = ({
 
 type Message = { message: StreamingLog["message"] };
 
-const AnyMessage = ({ message }: Message) => (
-  <pre>{JSON.stringify(message, null, "  ")}</pre>
-);
+const AnyMessage = ({ message }: Message) => <pre>{JSON.stringify(message, null, "  ")}</pre>;
 
 const RenderPart = ({ part }: { part: Part }) =>
   part.text && part.text.length ? (
@@ -92,8 +86,7 @@ const RenderPart = ({ part }: { part: Part }) =>
   );
 
 const ClientContentLog = ({ message }: Message) => {
-  const { turns, turnComplete } = (message as ClientContentMessage)
-    .clientContent;
+  const { turns, turnComplete } = (message as ClientContentMessage).clientContent;
   return (
     <div className="rich-log client-content user">
       <h4 className="roler-user">User</h4>
@@ -130,27 +123,23 @@ const ToolCallCancellationLog = ({ message }: Message): JSX.Element => (
     <span>
       {" "}
       ids:{" "}
-      {(message as ToolCallCancellationMessage).toolCallCancellation.ids.map(
-        (id) => (
-          <span className="inline-code" key={`cancel-${id}`}>
-            "{id}"
-          </span>
-        ),
-      )}
+      {(message as ToolCallCancellationMessage).toolCallCancellation.ids.map((id) => (
+        <span className="inline-code" key={`cancel-${id}`}>
+          "{id}"
+        </span>
+      ))}
     </span>
   </div>
 );
 
 const ToolResponseLog = ({ message }: Message): JSX.Element => (
   <div className={cn("rich-log tool-response")}>
-    {(message as ToolResponseMessage).toolResponse.functionResponses.map(
-      (fc) => (
-        <div key={`tool-response-${fc.id}`} className="part">
-          <h5>Function Response: {fc.id}</h5>
-          <pre>{JSON.stringify(fc.response, null, "  ")}</pre>
-        </div>
-      ),
-    )}
+    {(message as ToolResponseMessage).toolResponse.functionResponses.map((fc) => (
+      <div key={`tool-response-${fc.id}`} className="part">
+        <h5>Function Response: {fc.id}</h5>
+        <pre>{JSON.stringify(fc.response, null, "  ")}</pre>
+      </div>
+    ))}
   </div>
 );
 
@@ -171,9 +160,7 @@ const ModelTurnLog = ({ message }: Message): JSX.Element => {
   );
 };
 
-const CustomPlainTextLog = (msg: string) => () => (
-  <PlainTextMessage message={msg} />
-);
+const CustomPlainTextLog = (msg: string) => () => <PlainTextMessage message={msg} />;
 
 export type LoggerFilterType = "conversations" | "tools" | "none";
 
@@ -231,9 +218,7 @@ export default function Logger({ filter = "none" }: LoggerProps) {
     <div className="logger">
       <ul className="logger-list">
         {logs.filter(filterFn).map((log, key) => {
-          return (
-            <LogEntry MessageComponent={component(log)} log={log} key={key} />
-          );
+          return <LogEntry MessageComponent={component(log)} log={log} key={key} />;
         })}
       </ul>
     </div>

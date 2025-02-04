@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react'
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
-import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js'
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
-import type { ExpressionKey } from '../contexts/ExpressionContext'
+import { useEffect, useRef } from "react";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
+import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import type { ExpressionKey } from "../contexts/ExpressionContext";
 
 interface ModelViewerProps {
   className: string;
@@ -12,16 +12,16 @@ interface ModelViewerProps {
 }
 
 export function ModelViewer({ className, expression }: ModelViewerProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const sceneRef = useRef<THREE.Scene | null>(null)
-  const modelRef = useRef<THREE.Group | null>(null)
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
-  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
-  const controlsRef = useRef<OrbitControls | null>(null)
-  const animationFrameRef = useRef<number>()
-  const timeRef = useRef<number>(0)
-  const isHappyRef = useRef<boolean>(false)
-  const isSadRef = useRef<boolean>(false)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const modelRef = useRef<THREE.Group | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const controlsRef = useRef<OrbitControls | null>(null);
+  const animationFrameRef = useRef<number>();
+  const timeRef = useRef<number>(0);
+  const isHappyRef = useRef<boolean>(false);
+  const isSadRef = useRef<boolean>(false);
 
   // モデルの表情を更新する関数
   const updateModelExpression = (model: THREE.Group, expression: ExpressionKey | null) => {
@@ -29,27 +29,27 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
 
     // 表情に応じてモデルの回転や位置を変更
     switch (expression) {
-      case 'happy':
+      case "happy":
         model.rotation.x = Math.PI / 12; // 少し上を向く
         isHappyRef.current = true;
         break;
-      case 'sad':
+      case "sad":
         model.rotation.z = Math.PI / 2; // 横に倒れる
         isSadRef.current = true;
         break;
-      case 'angry':
+      case "angry":
         model.rotation.z = Math.PI / 24; // 少し傾く
         model.position.x = 0.1; // 少し横に動く
         break;
-      case 'surprised':
+      case "surprised":
         model.position.y = 0.3; // 大きく跳ねる
         model.scale.set(0.012, 0.012, 0.012); // 少し大きくなる
         break;
-      case 'fearful':
+      case "fearful":
         model.scale.set(0.008, 0.008, 0.008); // 少し小さくなる
         model.position.y = -0.2; // 下がる
         break;
-      case 'disgusted':
+      case "disgusted":
         model.rotation.z = -Math.PI / 24; // 反対に傾く
         model.position.x = -0.1; // 反対に動く
         break;
@@ -64,96 +64,95 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
 
   // シーンのセットアップ（初回のみ）
   useEffect(() => {
-    if (!containerRef.current) return
+    if (!containerRef.current) return;
 
     // シーン、カメラ、レンダラーを作成
-    const scene = new THREE.Scene()
-    sceneRef.current = scene
+    const scene = new THREE.Scene();
+    sceneRef.current = scene;
 
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-    camera.position.set(0, 1, 2)
-    cameraRef.current = camera
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.set(0, 1, 2);
+    cameraRef.current = camera;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true })
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    renderer.setPixelRatio(window.devicePixelRatio)
-    renderer.toneMapping = THREE.ACESFilmicToneMapping
-    renderer.toneMappingExposure = 1
-    rendererRef.current = renderer
-    containerRef.current.appendChild(renderer.domElement)
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1;
+    rendererRef.current = renderer;
+    containerRef.current.appendChild(renderer.domElement);
 
     // OrbitControlsを追加
-    const controls = new OrbitControls(camera, renderer.domElement)
-    controls.enableDamping = true // スムーズな動きを有効化
-    controls.dampingFactor = 0.05 // 減衰係数
-    controls.minDistance = 1 // 最小ズーム距離
-    controls.maxDistance = 10 // 最大ズーム距離
-    controls.enablePan = true // パン（平行移動）を有効化
-    controls.autoRotate = false // 自動回転を無効化
-    controlsRef.current = controls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true; // スムーズな動きを有効化
+    controls.dampingFactor = 0.05; // 減衰係数
+    controls.minDistance = 1; // 最小ズーム距離
+    controls.maxDistance = 10; // 最大ズーム距離
+    controls.enablePan = true; // パン（平行移動）を有効化
+    controls.autoRotate = false; // 自動回転を無効化
+    controlsRef.current = controls;
 
     // 照明を追加
-    const light = new THREE.DirectionalLight(0xffffff, 2)
-    light.position.set(1, 2, 3).normalize()
-    scene.add(light)
+    const light = new THREE.DirectionalLight(0xffffff, 2);
+    light.position.set(1, 2, 3).normalize();
+    scene.add(light);
 
     // 環境光を追加
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1)
-    scene.add(ambientLight)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    scene.add(ambientLight);
 
     // ローディングマネージャーを作成
-    const manager = new THREE.LoadingManager()
+    const manager = new THREE.LoadingManager();
     manager.onError = (url) => {
-      console.error('Error loading', url)
-    }
+      console.error("Error loading", url);
+    };
 
     // MTLローダーでマテリアルをロード
-    const mtlLoader = new MTLLoader(manager)
-    mtlLoader.setPath('/assets/obj/')
-    mtlLoader.load(
-      'rabbit.mtl',
-      (materials) => {
-        materials.preload()
+    const mtlLoader = new MTLLoader(manager);
+    mtlLoader.setPath("/assets/obj/");
+    mtlLoader.load("rabbit.mtl", (materials) => {
+      materials.preload();
 
-        // OBJローダーでモデルをロード
-        const objLoader = new OBJLoader(manager)
-        objLoader.setMaterials(materials)
-        objLoader.setPath('/assets/obj/')
-        objLoader.load(
-          'rabbit.obj',
-          (object) => {
-            modelRef.current = object
+      // OBJローダーでモデルをロード
+      const objLoader = new OBJLoader(manager);
+      objLoader.setMaterials(materials);
+      objLoader.setPath("/assets/obj/");
+      objLoader.load("rabbit.obj", (object) => {
+        modelRef.current = object;
 
-            // モデルのスケールと位置を調整
-            object.scale.set(0.01, 0.01, 0.01)
-            object.position.set(0, 0, 0)
-            object.rotation.y = Math.PI / 4
+        // モデルのスケールと位置を調整
+        object.scale.set(0.01, 0.01, 0.01);
+        object.position.set(0, 0, 0);
+        object.rotation.y = Math.PI / 4;
 
-            scene.add(object)
+        scene.add(object);
 
-            // カメラの位置を調整
-            camera.position.set(2, 1.5, 2)
-            camera.lookAt(new THREE.Vector3(0, 0.5, 0))
+        // カメラの位置を調整
+        camera.position.set(2, 1.5, 2);
+        camera.lookAt(new THREE.Vector3(0, 0.5, 0));
 
-            // コントロールの中心をモデルの少し上に設定
-            controls.target.set(0, 1, 0)
-            controls.update()
-          }
-        )
-      }
-    )
+        // コントロールの中心をモデルの少し上に設定
+        controls.target.set(0, 1, 0);
+        controls.update();
+      });
+    });
 
     // 環境マップの読み込み
-    const exrLoader = new EXRLoader()
-    exrLoader.load('/assets/exr/meadow.exr', (texture) => {
-      texture.mapping = THREE.EquirectangularReflectionMapping
-      scene.background = texture
-      scene.environment = texture
-    })
+    const exrLoader = new EXRLoader();
+    exrLoader.load("/assets/exr/meadow.exr", (texture) => {
+      texture.mapping = THREE.EquirectangularReflectionMapping;
+      scene.background = texture;
+      scene.environment = texture;
+    });
 
     // アニメーションループ
     function animate() {
-      animationFrameRef.current = requestAnimationFrame(animate)
+      animationFrameRef.current = requestAnimationFrame(animate);
 
       // Happyの時の跳ねるアニメーション
       if (isHappyRef.current && modelRef.current) {
@@ -176,58 +175,58 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
       }
 
       if (controlsRef.current) {
-        controlsRef.current.update()
+        controlsRef.current.update();
       }
       if (rendererRef.current && sceneRef.current && cameraRef.current) {
-        rendererRef.current.render(sceneRef.current, cameraRef.current)
+        rendererRef.current.render(sceneRef.current, cameraRef.current);
       }
     }
 
-    animate()
+    animate();
 
     // ウィンドウリサイズ時の処理
     function handleResize() {
-      if (!containerRef.current) return
+      if (!containerRef.current) return;
 
-      const width = window.innerWidth
-      const height = window.innerHeight
+      const width = window.innerWidth;
+      const height = window.innerHeight;
 
       if (cameraRef.current) {
-        cameraRef.current.aspect = width / height
-        cameraRef.current.updateProjectionMatrix()
+        cameraRef.current.aspect = width / height;
+        cameraRef.current.updateProjectionMatrix();
       }
 
       if (rendererRef.current) {
-        rendererRef.current.setSize(width, height)
+        rendererRef.current.setSize(width, height);
       }
     }
 
-    window.addEventListener('resize', handleResize)
+    window.addEventListener("resize", handleResize);
 
     // クリーンアップ関数
     return () => {
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener("resize", handleResize);
       if (containerRef.current && rendererRef.current) {
-        containerRef.current.removeChild(rendererRef.current.domElement)
+        containerRef.current.removeChild(rendererRef.current.domElement);
       }
       if (controlsRef.current) {
-        controlsRef.current.dispose()
+        controlsRef.current.dispose();
       }
       if (sceneRef.current) {
         sceneRef.current.traverse((object) => {
           if (object instanceof THREE.Mesh) {
-            object.geometry.dispose()
+            object.geometry.dispose();
             if (object.material instanceof THREE.Material) {
-              object.material.dispose()
+              object.material.dispose();
             }
           }
-        })
+        });
       }
       if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
+        cancelAnimationFrame(animationFrameRef.current);
       }
-    }
-  }, []) // 依存配列を空にして初回のみ実行
+    };
+  }, []); // 依存配列を空にして初回のみ実行
 
   // 表情の更新
   useEffect(() => {
@@ -238,7 +237,9 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
       isSadRef.current = false;
       updateModelExpression(modelRef.current, expression);
     }
-  }, [expression, updateModelExpression]) // expressionが変更されたときのみ実行
+  }, [expression, updateModelExpression]); // expressionが変更されたときのみ実行
 
-  return <div className={className} ref={containerRef} style={{ width: '100%', height: '100vh' }} />
+  return (
+    <div className={className} ref={containerRef} style={{ width: "100%", height: "100vh" }} />
+  );
 }

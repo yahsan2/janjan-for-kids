@@ -25,18 +25,10 @@ export type LiveAPIProviderProps = {
   userId?: string;
 };
 
-export const LiveAPIProvider: FC<LiveAPIProviderProps> = ({
-  url,
-  userId,
-  children,
-}) => {
+export const LiveAPIProvider: FC<LiveAPIProviderProps> = ({ url, userId, children }) => {
   const liveAPI = useLiveAPI({ url, userId });
 
-  return (
-    <LiveAPIContext.Provider value={liveAPI}>
-      {children}
-    </LiveAPIContext.Provider>
-  );
+  return <LiveAPIContext.Provider value={liveAPI}>{children}</LiveAPIContext.Provider>;
 };
 
 export const useLiveAPIContext = () => {

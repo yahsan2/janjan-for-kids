@@ -59,10 +59,7 @@ export class AudioRecorder extends EventEmitter {
       const src = createWorketFromSrc(workletName, AudioRecordingWorklet);
 
       await this.audioContext.audioWorklet.addModule(src);
-      this.recordingWorklet = new AudioWorkletNode(
-        this.audioContext,
-        workletName,
-      );
+      this.recordingWorklet = new AudioWorkletNode(this.audioContext, workletName);
 
       this.recordingWorklet.port.onmessage = async (ev: MessageEvent) => {
         // worklet processes recording floats and messages converted buffer
@@ -78,7 +75,7 @@ export class AudioRecorder extends EventEmitter {
       // vu meter worklet
       const vuWorkletName = "vu-meter";
       await this.audioContext.audioWorklet.addModule(
-        createWorketFromSrc(vuWorkletName, VolMeterWorket),
+        createWorketFromSrc(vuWorkletName, VolMeterWorket)
       );
       this.vuWorklet = new AudioWorkletNode(this.audioContext, vuWorkletName);
       this.vuWorklet.port.onmessage = (ev: MessageEvent) => {

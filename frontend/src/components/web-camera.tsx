@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react'
-import React from 'react';
-import { useExpression } from '../contexts/ExpressionContext'
-import { useStreaming } from '../contexts/StreamingContext'
+import { useEffect, useRef } from "react";
+import React from "react";
+import { useExpression } from "../contexts/ExpressionContext";
+import { useStreaming } from "../contexts/StreamingContext";
 
-export function WebCamera({className}: {className: string}) {
+export function WebCamera({ className }: { className: string }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const {
     isStreaming,
@@ -11,13 +11,9 @@ export function WebCamera({className}: {className: string}) {
     stopCamera,
     error,
     registerDisplayVideo,
-    unregisterDisplayVideo
-  } = useStreaming()
-  const {
-    expressionKey,
-    expressionText,
-    isModelLoaded
-  } = useExpression()
+    unregisterDisplayVideo,
+  } = useStreaming();
+  const { expressionKey, expressionText, isModelLoaded } = useExpression();
 
   // 表示用のビデオ要素を登録
   useEffect(() => {
@@ -40,18 +36,14 @@ export function WebCamera({className}: {className: string}) {
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
           disabled={!isModelLoaded}
         >
-          {isStreaming ? 'カメラを停止' : 'カメラを有効にする'}
+          {isStreaming ? "カメラを停止" : "カメラを有効にする"}
         </button>
       </div>
-      {error && (
-        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
-          {error}
-        </div>
-      )}
+      {error && <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">{error}</div>}
       <div>
         <h3 className="text-lg font-semibold mb-2">表情認識</h3>
         <p className="mb-2 text-lg font-medium text-blue-600">
-          現在の表情: {expressionText || '読み込み中...'}
+          現在の表情: {expressionText || "読み込み中..."}
           {expressionKey && <span className="text-gray-500 text-sm ml-2">({expressionKey})</span>}
         </p>
         <video
@@ -65,5 +57,5 @@ export function WebCamera({className}: {className: string}) {
         </video>
       </div>
     </div>
-  )
+  );
 }

@@ -25,7 +25,7 @@ const soundLogs = (n: number): StreamingLog[] =>
       date: new Date(),
       type: "server.audio",
       message: "buffer (11250)",
-    }),
+    })
   );
 //
 const realtimeLogs = (n: number): StreamingLog[] =>
@@ -34,7 +34,7 @@ const realtimeLogs = (n: number): StreamingLog[] =>
       date: new Date(),
       type: "client.realtimeInput",
       message: "audio",
-    }),
+    })
   );
 
 export const mockLogs: StreamingLog[] = [

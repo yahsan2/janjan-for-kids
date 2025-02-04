@@ -24,7 +24,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "vite build && firebase deploy"
+    "deploy": "vite build && firebase deploy",
+    "format": "biome format --write ."
   },
   "browserslist": {
     "production": [

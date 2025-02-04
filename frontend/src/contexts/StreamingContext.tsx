@@ -1,5 +1,13 @@
-import React, { createContext, useContext, useState, useRef, useCallback, useEffect, type ReactNode } from 'react';
-import { useExpression } from './ExpressionContext';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  type ReactNode,
+} from "react";
+import { useExpression } from "./ExpressionContext";
 
 interface StreamingContextType {
   isStreaming: boolean;
@@ -25,7 +33,7 @@ export function StreamingProvider({ children }: { children: ReactNode }) {
 
   // 初期化時に video 要素を作成
   React.useEffect(() => {
-    const video = document.createElement('video');
+    const video = document.createElement("video");
     video.autoplay = true;
     video.playsInline = true;
     // video要素をDOMに追加しないようにする
@@ -42,11 +50,11 @@ export function StreamingProvider({ children }: { children: ReactNode }) {
   // ストリーミング状態の監視
   useEffect(() => {
     if (isStreaming && isModelLoaded && videoRef.current && !hasStartedDetectionRef.current) {
-      console.log('ストリーミング開始、表情認識を開始します');
+      console.log("ストリーミング開始、表情認識を開始します");
       hasStartedDetectionRef.current = true;
       startDetection(videoRef.current);
     } else if (!isStreaming && hasStartedDetectionRef.current) {
-      console.log('ストリーミング停止、表情認識を停止します');
+      console.log("ストリーミング停止、表情認識を停止します");
       stopDetection();
       hasStartedDetectionRef.current = false;
     }
@@ -54,12 +62,12 @@ export function StreamingProvider({ children }: { children: ReactNode }) {
 
   const startCamera = useCallback(async () => {
     if (!videoRef.current) {
-      setError('Video element is not initialized');
+      setError("Video element is not initialized");
       return;
     }
 
     if (!isModelLoaded) {
-      setError('顔認識モデルの読み込みが完了するまでお待ちください');
+      setError("顔認識モデルの読み込みが完了するまでお待ちください");
       return;
     }
 
@@ -68,9 +76,9 @@ export function StreamingProvider({ children }: { children: ReactNode }) {
         video: {
           width: { ideal: 640 },
           height: { ideal: 480 },
-          facingMode: 'user'
+          facingMode: "user",
         },
-        audio: false
+        audio: false,
       });
 
       // メインのビデオ要素にストリームを設定
@@ -82,13 +90,13 @@ export function StreamingProvider({ children }: { children: ReactNode }) {
       }
 
       videoRef.current.onloadedmetadata = () => {
-        console.log('ビデオメタデータ読み込み完了');
+        console.log("ビデオメタデータ読み込み完了");
         setIsStreaming(true);
         setError(null);
       };
     } catch (error) {
-      console.error('カメラの起動に失敗しました:', error);
-      setError('カメラの起動に失敗しました。カメラへのアクセスを許可してください。');
+      console.error("カメラの起動に失敗しました:", error);
+      setError("カメラの起動に失敗しました。カメラへのアクセスを許可してください。");
     }
   }, [isModelLoaded]);
 
@@ -129,17 +137,19 @@ export function StreamingProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <StreamingContext.Provider value={{
-      isStreaming,
-      setIsStreaming,
-      startCamera,
-      stopCamera,
-      getVideoElement,
-      error,
-      setError,
-      registerDisplayVideo,
-      unregisterDisplayVideo
-    }}>
+    <StreamingContext.Provider
+      value={{
+        isStreaming,
+        setIsStreaming,
+        startCamera,
+        stopCamera,
+        getVideoElement,
+        error,
+        setError,
+        registerDisplayVideo,
+        unregisterDisplayVideo,
+      }}
+    >
       {children}
     </StreamingContext.Provider>
   );
@@ -148,7 +158,7 @@ export function StreamingProvider({ children }: { children: ReactNode }) {
 export function useStreaming() {
   const context = useContext(StreamingContext);
   if (context === undefined) {
-    throw new Error('useStreaming must be used within a StreamingProvider');
+    throw new Error("useStreaming must be used within a StreamingProvider");
   }
   return context;
 }

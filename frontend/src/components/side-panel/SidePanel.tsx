@@ -115,15 +115,11 @@ export default function SidePanel() {
           }}
         />
         <div className={cn("streaming-indicator", { connected })}>
-          {connected
-            ? `🔵${open ? " Streaming" : ""}`
-            : `⏸️${open ? " Paused" : ""}`}
+          {connected ? `🔵${open ? " Streaming" : ""}` : `⏸️${open ? " Paused" : ""}`}
         </div>
       </section>
       <div className="side-panel-container" ref={loggerRef}>
-        <Logger
-          filter={(selectedOption?.value as LoggerFilterType) || "none"}
-        />
+        <Logger filter={(selectedOption?.value as LoggerFilterType) || "none"} />
       </div>
       <div className={cn("input-container", { disabled: !connected })}>
         <div className="input-content">
@@ -148,10 +144,7 @@ export default function SidePanel() {
             Type&nbsp;something...
           </span>
 
-          <button
-            className="send-button material-symbols-outlined filled"
-            onClick={handleSubmit}
-          >
+          <button className="send-button material-symbols-outlined filled" onClick={handleSubmit}>
             send
           </button>
         </div>

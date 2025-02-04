@@ -53,7 +53,7 @@ const MediaStreamButton = memo(
       <button className="action-button" onClick={start}>
         <span className="material-symbols-outlined">{offIcon}</span>
       </button>
-    ),
+    )
 );
 
 function ControlTray({
@@ -63,8 +63,7 @@ function ControlTray({
   supportsVideo,
 }: ControlTrayProps) {
   const videoStreams = [useWebcam(), useScreenCapture()];
-  const [activeVideoStream, setActiveVideoStream] =
-    useState<MediaStream | null>(null);
+  const [activeVideoStream, setActiveVideoStream] = useState<MediaStream | null>(null);
   const [webcam, screenCapture] = videoStreams;
   const [inVolume, setInVolume] = useState(0);
   const [audioRecorder] = useState(() => new AudioRecorder());
@@ -72,8 +71,7 @@ function ControlTray({
   const renderCanvasRef = useRef<HTMLCanvasElement>(null);
   const connectButtonRef = useRef<HTMLButtonElement>(null);
 
-  const { client, connected, connect, disconnect, volume } =
-    useLiveAPIContext();
+  const { client, connected, connect, disconnect, volume } = useLiveAPIContext();
 
   useEffect(() => {
     if (!connected && connectButtonRef.current) {
@@ -83,7 +81,7 @@ function ControlTray({
   useEffect(() => {
     document.documentElement.style.setProperty(
       "--volume",
-      `${Math.max(5, Math.min(inVolume * 200, 8))}px`,
+      `${Math.max(5, Math.min(inVolume * 200, 8))}px`
     );
   }, [inVolume]);
 
@@ -160,10 +158,7 @@ function ControlTray({
     <section className="control-tray">
       <canvas style={{ display: "none" }} ref={renderCanvasRef} />
       <nav className={cn("actions-nav", { disabled: !connected })}>
-        <button
-          className={cn("action-button mic-button")}
-          onClick={() => setMuted(!muted)}
-        >
+        <button className={cn("action-button mic-button")} onClick={() => setMuted(!muted)}>
           {!muted ? (
             <span className="material-symbols-outlined filled">mic</span>
           ) : (

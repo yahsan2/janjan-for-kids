@@ -42,14 +42,8 @@ export type UseLiveAPIProps = {
   onRunIdChange?: Dispatch<SetStateAction<string>>;
 };
 
-export function useLiveAPI({
-  url,
-  userId,
-}: UseLiveAPIProps): UseLiveAPIResults {
-  const client = useMemo(
-    () => new MultimodalLiveClient({ url, userId }),
-    [url, userId],
-  );
+export function useLiveAPI({ url, userId }: UseLiveAPIProps): UseLiveAPIResults {
+  const client = useMemo(() => new MultimodalLiveClient({ url, userId }), [url, userId]);
   const audioStreamerRef = useRef<AudioStreamer | null>(null);
 
   const [connected, setConnected] = useState(false);
@@ -78,19 +72,12 @@ export function useLiveAPI({
 
     const stopAudioStreamer = () => audioStreamerRef.current?.stop();
 
-    const onAudio = (data: ArrayBuffer) =>
-      audioStreamerRef.current?.addPCM16(new Uint8Array(data));
+    const onAudio = (data: ArrayBuffer) => audioStreamerRef.current?.addPCM16(new Uint8Array(data));
 
-    client
-      .on("close", onClose)
-      .on("interrupted", stopAudioStreamer)
-      .on("audio", onAudio);
+    client.on("close", onClose).on("interrupted", stopAudioStreamer).on("audio", onAudio);
 
     return () => {
-      client
-        .off("close", onClose)
-        .off("interrupted", stopAudioStreamer)
-        .off("audio", onAudio);
+      client.off("close", onClose).off("interrupted", stopAudioStreamer).off("audio", onAudio);
     };
   }, [client]);
 
