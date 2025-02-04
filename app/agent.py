@@ -15,10 +15,6 @@
 import os
 from typing import Dict
 from dotenv import load_dotenv
-
-# 環境変数を確実に読み込む
-load_dotenv(override=True)
-
 from app.templates import FORMAT_DOCS, SYSTEM_INSTRUCTION
 from app.vector_store import get_vector_store
 import google
@@ -27,9 +23,15 @@ from google.genai.types import Content, FunctionDeclaration, LiveConnectConfig, 
 from langchain_google_vertexai import VertexAIEmbeddings
 import vertexai
 
+# 環境変数を確実に読み込む
+load_dotenv(override=True)
+
+# Initialize Google Cloud clients
+credentials, project = google.auth.default()
+
 # Constants
-PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
-LOCATION = os.getenv("GOOGLE_CLOUD_REGION")
+PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", project)
+LOCATION = os.getenv("GOOGLE_CLOUD_REGION", "us-central1")
 EMBEDDING_MODEL = "text-embedding-004"
 
 if not PROJECT_ID or not LOCATION:
@@ -41,9 +43,6 @@ MODEL_ID = "gemini-2.0-flash-exp"
 URLS = [
     "https://cloud.google.com/architecture/deploy-operate-generative-ai-applications"
 ]
-
-# Initialize Google Cloud clients
-credentials, project = google.auth.default()
 
 vertexai.init(project=PROJECT_ID, location=LOCATION, credentials=credentials)
 genai_client = genai.Client(

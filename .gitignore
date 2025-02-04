@@ -1,5 +1,7 @@
 node_modules
 dist
+build
+.firebase
 .dev.vars
 .env
 .persist_vector_store

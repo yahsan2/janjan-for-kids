@@ -108,13 +108,14 @@ You can quickly test the application in [Cloud Run](https://cloud.google.com/run
 1. **Deploy:**
 
    ```bash
-   export REGION="your-gcp-region"
+   export REGION="us-central1"
 
-   gcloud run deploy genai-app-sample \
+   gcloud run deploy janjan-for-kids \
      --source . \
      --project $PROJECT_ID \
      --memory "4Gi" \
-     --region $REGION
+     --region $REGION \
+     --port 8080
    ```
 
 2. **Access:** Use [Cloud Run proxy](https://cloud.google.com/sdk/gcloud/reference/run/services/proxy) for local access. The backend will be accessible at `http://localhost:8000`:
