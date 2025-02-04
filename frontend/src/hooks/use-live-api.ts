@@ -15,16 +15,16 @@
  */
 
 import {
+  type Dispatch,
+  type SetStateAction,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  Dispatch,
-  SetStateAction,
 } from "react";
-import { MultimodalLiveClient } from "../utils/multimodal-live-client";
 import { AudioStreamer } from "../utils/audio-streamer";
+import { MultimodalLiveClient } from "../utils/multimodal-live-client";
 import { audioContext } from "../utils/utils";
 import VolMeterWorket from "../utils/worklets/vol-meter";
 
