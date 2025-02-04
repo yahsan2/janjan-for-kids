@@ -11,6 +11,34 @@ interface ModelViewerProps {
   expression: ExpressionKey | null;
 }
 
+// カメラの初期位置を定数として定義
+const INITIAL_CAMERA_POSITION = {
+  x: 4,
+  y: 0.5,
+  z: 2
+};
+
+// カメラの初期ズーム設定を定数として定義
+const INITIAL_CAMERA_ZOOM = {
+  min: 1,
+  max: 10,
+  current: 2.2
+};
+
+// モデルの初期スケール設定を定数として定義
+const INITIAL_MODEL_SCALE = {
+  x: 0.02,
+  y: 0.02,
+  z: 0.02
+};
+
+// モデルの初期位置を定数として定義
+const INITIAL_MODEL_POSITION = {
+  x: 1,
+  y: -0.8,
+  z: 0
+};
+
 export function ModelViewer({ className, expression }: ModelViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -24,6 +52,13 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
   const isHappyRef = useRef<boolean>(false);
   const isSadRef = useRef<boolean>(false);
 
+  // カメラの現在の相対位置を保持する参照
+  const cameraOffsetRef = useRef({x: 0, y: 0, z: 0});
+  // モデルの現在の相対スケールを保持する参照
+  const modelScaleRef = useRef({x: 0, y: 0, z: 0});
+  // モデルの現在の相対位置を保持する参照
+  const modelPositionRef = useRef({x: 0, y: 0, z: 0});
+
   // モデルの表情を更新する関数
   const updateModelExpression = (model: THREE.Group, expression: ExpressionKey | null) => {
     if (!model) return;
@@ -32,33 +67,75 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
     switch (expression) {
       case "happy":
         model.rotation.x = Math.PI / 12; // 少し上を向く
+        model.position.set(
+          INITIAL_MODEL_POSITION.x,
+          INITIAL_MODEL_POSITION.y + 0.2,
+          INITIAL_MODEL_POSITION.z
+        );
         isHappyRef.current = true;
         break;
       case "sad":
         model.rotation.z = Math.PI / 2; // 横に倒れる
+        model.position.set(
+          INITIAL_MODEL_POSITION.x,
+          INITIAL_MODEL_POSITION.y - 0.1,
+          INITIAL_MODEL_POSITION.z
+        );
         isSadRef.current = true;
         break;
       case "angry":
         model.rotation.z = Math.PI / 24; // 少し傾く
-        model.position.x = 0.1; // 少し横に動く
+        model.position.set(
+          INITIAL_MODEL_POSITION.x + 0.1,
+          INITIAL_MODEL_POSITION.y,
+          INITIAL_MODEL_POSITION.z
+        ); // 少し横に動く
         break;
       case "surprised":
-        model.position.y = 0.3; // 大きく跳ねる
-        model.scale.set(0.012, 0.012, 0.012); // 少し大きくなる
+        model.position.set(
+          INITIAL_MODEL_POSITION.x,
+          INITIAL_MODEL_POSITION.y + 0.3,
+          INITIAL_MODEL_POSITION.z
+        ); // 大きく跳ねる
+        model.scale.set(
+          INITIAL_MODEL_SCALE.x * 1.2,
+          INITIAL_MODEL_SCALE.y * 1.2,
+          INITIAL_MODEL_SCALE.z * 1.2
+        );
         break;
       case "fearful":
-        model.scale.set(0.008, 0.008, 0.008); // 少し小さくなる
-        model.position.y = -0.2; // 下がる
+        model.scale.set(
+          INITIAL_MODEL_SCALE.x * 0.8,
+          INITIAL_MODEL_SCALE.y * 0.8,
+          INITIAL_MODEL_SCALE.z * 0.8
+        );
+        model.position.set(
+          INITIAL_MODEL_POSITION.x,
+          INITIAL_MODEL_POSITION.y - 0.2,
+          INITIAL_MODEL_POSITION.z
+        ); // 下がる
         break;
       case "disgusted":
         model.rotation.z = -Math.PI / 24; // 反対に傾く
-        model.position.x = -0.1; // 反対に動く
+        model.position.set(
+          INITIAL_MODEL_POSITION.x - 0.1,
+          INITIAL_MODEL_POSITION.y,
+          INITIAL_MODEL_POSITION.z
+        ); // 反対に動く
         break;
       default:
         // neutral, noface, error, nullの場合は初期状態に戻す
         model.rotation.set(0, Math.PI / 4, 0);
-        model.position.set(0, 0, 0);
-        model.scale.set(0.01, 0.01, 0.01);
+        model.position.set(
+          INITIAL_MODEL_POSITION.x,
+          INITIAL_MODEL_POSITION.y,
+          INITIAL_MODEL_POSITION.z
+        );
+        model.scale.set(
+          INITIAL_MODEL_SCALE.x,
+          INITIAL_MODEL_SCALE.y,
+          INITIAL_MODEL_SCALE.z
+        );
         break;
     }
   };
@@ -77,7 +154,11 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
       0.1,
       1000
     );
-    camera.position.set(0, 1, 2);
+    camera.position.set(
+      INITIAL_CAMERA_POSITION.x,
+      INITIAL_CAMERA_POSITION.y,
+      INITIAL_CAMERA_POSITION.z
+    );
     cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({
@@ -94,8 +175,8 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
     const controls = new OrbitControls(camera, canvasRef.current);
     controls.enableDamping = true; // スムーズな動きを有効化
     controls.dampingFactor = 0.05; // 減衰係数
-    controls.minDistance = 1; // 最小ズーム距離
-    controls.maxDistance = 10; // 最大ズーム距離
+    controls.minDistance = INITIAL_CAMERA_ZOOM.min; // 最小ズーム距離
+    controls.maxDistance = INITIAL_CAMERA_ZOOM.max; // 最大ズーム距離
     controls.enablePan = true; // パン（平行移動）を有効化
     controls.autoRotate = false; // 自動回転を無効化
     controlsRef.current = controls;
@@ -129,14 +210,26 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
         modelRef.current = object;
 
         // モデルのスケールと位置を調整
-        object.scale.set(0.01, 0.01, 0.01);
-        object.position.set(0, 0, 0);
+        object.scale.set(
+          INITIAL_MODEL_SCALE.x,
+          INITIAL_MODEL_SCALE.y,
+          INITIAL_MODEL_SCALE.z
+        );
+        object.position.set(
+          INITIAL_MODEL_POSITION.x,
+          INITIAL_MODEL_POSITION.y,
+          INITIAL_MODEL_POSITION.z
+        );
         object.rotation.y = Math.PI / 4;
 
         scene.add(object);
 
         // カメラの位置を調整
-        camera.position.set(2, 1.5, 2);
+        camera.position.set(
+          INITIAL_CAMERA_POSITION.x + cameraOffsetRef.current.x,
+          INITIAL_CAMERA_POSITION.y + cameraOffsetRef.current.y,
+          INITIAL_CAMERA_POSITION.z + cameraOffsetRef.current.z
+        );
         camera.lookAt(new THREE.Vector3(0, 0.5, 0));
 
         // コントロールの中心をモデルの少し上に設定
