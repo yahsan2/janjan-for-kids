@@ -1,0 +1,28 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 07.04.2019 08:33:46
+
+newmtl carrot
+	Ns 33.000000
+	Ni 1.500000
+	d 1.000000
+	Tr 0.000000
+	Tf 1.000000 1.000000 1.000000 
+	illum 2
+	Ka 1.000000 0.607843 0.290196
+	Kd 1.000000 0.607843 0.290196
+	Ks 0.864000 0.864000 0.864000
+	Ke 0.000000 0.000000 0.000000
+	map_Ka H:\3dmodel\turbosquid\rabbit_2\carrot.png
+	map_Kd H:\3dmodel\turbosquid\rabbit_2\carrot.png
+
+newmtl green
+	Ns 29.999998
+	Ni 1.500000
+	d 1.000000
+	Tr 0.000000
+	Tf 1.000000 1.000000 1.000000 
+	illum 2
+	Ka 0.164706 0.435294 0.000000
+	Kd 0.164706 0.435294 0.000000
+	Ks 0.819000 0.819000 0.819000
+	Ke 0.000000 0.000000 0.000000
