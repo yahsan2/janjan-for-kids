@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-import { Content, GenerativeContentBlob, Part } from "@google/generative-ai";
+import type { Content, GenerativeContentBlob, Part } from "@google/generative-ai";
 import { EventEmitter } from "eventemitter3";
 import { difference } from "lodash";
 import {
-  ClientContentMessage,
+  type ClientContentMessage,
+  type LiveConfig,
+  type LiveIncomingMessage,
+  type ModelTurn,
+  type RealtimeInputMessage,
+  type ServerContent,
+  type StreamingLog,
+  type ToolCall,
+  type ToolCallCancellation,
+  type ToolResponseMessage,
   isInterrupted,
   isModelTurn,
   isServerContenteMessage,
@@ -26,17 +35,8 @@ import {
   isToolCallCancellationMessage,
   isToolCallMessage,
   isTurnComplete,
-  LiveIncomingMessage,
-  ModelTurn,
-  RealtimeInputMessage,
-  ServerContent,
-  StreamingLog,
-  ToolCall,
-  ToolCallCancellation,
-  ToolResponseMessage,
-  type LiveConfig,
 } from "../multimodal-live-types";
-import { blobToJSON, base64ToArrayBuffer } from "./utils";
+import { base64ToArrayBuffer, blobToJSON } from "./utils";
 
 /**
  * the events that this client will emit
@@ -69,12 +69,12 @@ export type MultimodalLiveAPIClientConnection = {
 export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEventTypes> {
   public ws: WebSocket | null = null;
   protected config: LiveConfig | null = null;
-  public url: string = "";
+  public url = "";
   private runId: string;
   private userId?: string;
   constructor({ url, userId, runId }: MultimodalLiveAPIClientConnection) {
     super();
-    url = url || `ws://localhost:8000/ws`;
+    url = url || "ws://localhost:8000/ws";
     this.url = new URL("ws", url).href;
     this.userId = userId;
     this.runId = runId || crypto.randomUUID(); // Ensure runId is always a string by providing default
@@ -148,7 +148,7 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
             if (preludeIndex > 0) {
               reason = reason.slice(
                 preludeIndex + prelude.length + 1,
-                Infinity,
+                Number.POSITIVE_INFINITY,
               );
             }
           }
@@ -297,7 +297,7 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
   /**
    * send normal content parts such as { text }
    */
-  send(parts: Part | Part[], turnComplete: boolean = true) {
+  send(parts: Part | Part[], turnComplete = true) {
     parts = Array.isArray(parts) ? parts : [parts];
     const content: Content = {
       role: "user",
