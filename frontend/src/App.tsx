@@ -16,10 +16,10 @@
 
 import { useRef, useState } from "react";
 import "./App.scss";
-import { LiveAPIProvider } from "./contexts/LiveAPIContext";
-import SidePanel from "./components/side-panel/SidePanel";
-import ControlTray from "./components/control-tray/ControlTray";
 import cn from "classnames";
+import ControlTray from "./components/control-tray/ControlTray";
+import SidePanel from "./components/side-panel/SidePanel";
+import { LiveAPIProvider } from "./contexts/LiveAPIContext";
 
 const defaultHost = "localhost:8000";
 const defaultUri = `ws://${defaultHost}/`;
@@ -38,7 +38,7 @@ function App() {
 
   const submitFeedback = async () => {
     const feedbackUrl = new URL('feedback', serverUrl.replace('ws', 'http')).href;
-    
+
     try {
       const response = await fetch(feedbackUrl, {
         method: 'POST',
@@ -102,7 +102,7 @@ function App() {
                   style={{
                     cursor: 'text',
                     padding: '4px',
-                    margin: '0 4px', 
+                    margin: '0 4px',
                     borderRadius: '2px',
                     border: '1px solid #ccc',
                     fontSize: '14px',
@@ -120,7 +120,7 @@ function App() {
                   style={{
                     cursor: 'text',
                     padding: '4px',
-                    margin: '0 4px', 
+                    margin: '0 4px',
                     borderRadius: '2px',
                     border: '1px solid #ccc',
                     fontSize: '14px',
@@ -131,7 +131,7 @@ function App() {
               </div>
 
               {/* Feedback Button */}
-              <button 
+              <button
                 onClick={() => setShowFeedback(!sendFeedback)}
                 style={{
                   padding: '5px 10px',
