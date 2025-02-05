@@ -8,7 +8,7 @@ build
 .DS_Store
 
 server-build
-app/__pycache__
+**/__pycache__/**
 
 # Change them to your taste:
 package-lock.json
