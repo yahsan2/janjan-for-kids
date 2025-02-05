@@ -177,8 +177,10 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
     controls.dampingFactor = 0.05; // 減衰係数
     controls.minDistance = INITIAL_CAMERA_ZOOM.min; // 最小ズーム距離
     controls.maxDistance = INITIAL_CAMERA_ZOOM.max; // 最大ズーム距離
-    controls.enablePan = true; // パン（平行移動）を有効化
+    controls.enablePan = false; // パン（平行移動）を無効化
     controls.autoRotate = false; // 自動回転を無効化
+    controls.enableRotate = false; // 回転を無効化
+    controls.enableZoom = false; // ズームを無効化
     controlsRef.current = controls;
 
     // 照明を追加
