@@ -1,12 +1,18 @@
 from typing import Dict
+import os
+import firebase_admin
+from firebase_admin import credentials, firestore
 
-MOCK_USER_LEVELS = {
-    "default": {
-        "name": "ゲスト",
-        "current_level": 100,
-    }
-}
+# Firebase Admin SDKの初期化
+if os.getenv('K_SERVICE'):
+    # Cloud Run 環境では、デフォルトの認証情報を使用
+    firebase_admin.initialize_app()
+else:
+    # ローカル開発環境では、credentials.json を使用
+    cred = credentials.Certificate('firebase-credentials.json')
+    firebase_admin.initialize_app(cred)
 
+db = firestore.client()
 
 def get_user_level(user_id: str) -> Dict[str, any]:
     """
@@ -18,31 +24,38 @@ def get_user_level(user_id: str) -> Dict[str, any]:
     Returns:
         Dict with user's current level information
     """
-    # 実際のデータベースの代わりにモックデータを返す
-    user_data = MOCK_USER_LEVELS.get(user_id, MOCK_USER_LEVELS["default"])
-    return {
-        "name": user_data["name"],
-        "current_level": user_data["current_level"],
-    }
+    doc_ref = db.collection('users').document(user_id)
+    doc = doc_ref.get()
 
+    if not doc.exists:
+        # ユーザーが存在しない場合はデフォルト値を返す
+        return {
+            "name": "ゲスト",
+            "current_level": 1,
+        }
+
+    user_data = doc.to_dict()
+    return {
+        "name": user_data.get("name", "ゲスト"),
+        "current_level": user_data.get("current_level", 1),
+    }
 
 def set_user_name(user_id: str, name: str) -> Dict[str, str]:
     """
-    ユーザーの名前と敬称を設定します。
+    ユーザーの名前を設定します。
 
     Args:
         user_id: ユーザーの識別子
         name: ユーザーの名前
-        name_suffix: 敬称（ちゃん/くん/さん）
 
     Returns:
         Dict with user name information
     """
-    if user_id not in MOCK_USER_LEVELS:
-        MOCK_USER_LEVELS[user_id] = dict(MOCK_USER_LEVELS["default"])
-
-    user_data = MOCK_USER_LEVELS[user_id]
-    user_data["name"] = name
+    doc_ref = db.collection('users').document(user_id)
+    doc_ref.set({
+        'name': name,
+        'current_level': 1,
+    }, merge=True)
 
     return {
         "name": name,

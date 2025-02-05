@@ -23,6 +23,8 @@ beautifulsoup4 = "^4.12.3"
 scikit-learn = "^1.6.0"
 google-cloud-logging = "^3.11.3"
 python-dotenv = "^1.0.1"
+firebase-admin = "^6.6.0"
+google-cloud-firestore = "^2.20.0"
 
 
 [tool.poetry.group.dev.dependencies]
