@@ -24,7 +24,7 @@ import { ExpressionProvider } from "./contexts/ExpressionContext";
 import { LiveAPIProvider } from "./contexts/LiveAPIContext";
 import { StreamingProvider } from "./contexts/StreamingContext";
 import { useConfig } from "./hooks/use-config";
-import { useAuth } from "./hooks/useAuth";
+import { useAuth } from "./hooks/use-auth";
 import { ModelContainer } from "./components/model-viewer-container";
 
 function App() {
