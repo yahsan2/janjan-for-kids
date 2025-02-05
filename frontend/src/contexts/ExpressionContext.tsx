@@ -50,7 +50,7 @@ export function ExpressionProvider({ children }: { children: ReactNode }) {
   const [expressionKey, setExpressionKey] = useState<ExpressionKey | null>(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const timeoutRef = useRef<number>();
+  const timeoutRef = useRef<number>(null);
   const isDetectingRef = useRef(false);
 
   // 日本語の表情テキストをメモ化
