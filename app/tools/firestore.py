@@ -26,7 +26,7 @@ def get_user_level(user_id: str) -> Dict[str, any]:
     }
 
 
-def set_user_name(user_id: str, name: str, name_suffix: str) -> Dict[str, str]:
+def set_user_name(user_id: str, name: str) -> Dict[str, str]:
     """
     ユーザーの名前と敬称を設定します。
 
@@ -43,10 +43,8 @@ def set_user_name(user_id: str, name: str, name_suffix: str) -> Dict[str, str]:
 
     user_data = MOCK_USER_LEVELS[user_id]
     user_data["name"] = name
-    user_data["name_suffix"] = name_suffix
 
     return {
         "name": name,
-        "name_suffix": name_suffix,
-        "display_name": f"{name}{name_suffix}"
+        "current_level": 1,
     }
