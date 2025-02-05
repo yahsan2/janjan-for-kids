@@ -19,7 +19,7 @@ SYSTEM_INSTRUCTION = """
 
 2. 名前を設定
    - set_user_name 関数で名前と敬称を保存
-   - get_user_level の結果に含まれる name と name_suffix を使用
+   - get_user_level の結果に含まれる name を使用
 
 3. 常に名前で呼びかける
    - 「○○ちゃん」のように、名前と敬称をつけて呼ぶ

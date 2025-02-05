@@ -14,6 +14,7 @@
 
 import os
 from typing import Dict
+from app.tools.firestore import get_user_level, set_user_name
 from dotenv import load_dotenv
 from app.templates import FORMAT_DOCS, SYSTEM_INSTRUCTION
 from app.vector_store import get_vector_store
@@ -74,18 +75,43 @@ def retrieve_docs(query: str) -> Dict[str, str]:
     return {"output": formatted_docs}
 
 
-# Configure tools and live connection
-retrieve_docs_tool = Tool(
-    function_declarations=[
-        FunctionDeclaration.from_function(client=genai_client, func=retrieve_docs)
-    ]
-)
+tool_functions = {
+    "retrieve_docs": retrieve_docs,
+    "get_user_level": get_user_level,
+    "set_user_name": set_user_name,
+}
 
-tool_functions = {"retrieve_docs": retrieve_docs}
+# Create tool declarations
+tools = [
+    Tool(
+        function_declarations=[
+            FunctionDeclaration.from_function(
+                client=genai_client,
+                func=retrieve_docs,
+            ),
+        ]
+    ),
+    Tool(
+        function_declarations=[
+            FunctionDeclaration.from_function(
+                client=genai_client,
+                func=get_user_level,
+            )
+        ]
+    ),
+    Tool(
+        function_declarations=[
+            FunctionDeclaration.from_function(
+                client=genai_client,
+                func=set_user_name,
+            )
+        ]
+    ),
+]
 
 live_connect_config = LiveConnectConfig(
     response_modalities=["AUDIO"],
-    tools=[retrieve_docs_tool],
+    tools=tools,
     system_instruction=Content(parts=[{"text": SYSTEM_INSTRUCTION}]),
     speech_config={
         "voice_config": {
