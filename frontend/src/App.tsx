@@ -20,7 +20,7 @@ import { useRef, useState, useEffect } from "react";
 import ControlTray from "./components/control-tray/ControlTray";
 import SidePanel from "./components/side-panel/SidePanel";
 import { WelcomeOverlay } from "./components/welcome-overlay";
-import { ExpressionProvider } from "./contexts/ExpressionContext";
+import { ExpressionProvider, useExpression } from "./contexts/ExpressionContext";
 import { LiveAPIProvider } from "./contexts/LiveAPIContext";
 import { StreamingProvider } from "./contexts/StreamingContext";
 import { useConfig } from "./hooks/use-config";
@@ -31,9 +31,61 @@ function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const [runId] = useState<string>(crypto.randomUUID());
-  const { user, loading, signInAnonymousUser } = useAuth();
   const [isOpen, setIsOpen] = useState(true);
-  const { wsUrl, isDev } = useConfig();
+  const { isDev } = useConfig();
+
+  useExpression({
+    onFaceDetected: () => {
+      console.log("顔を検出しました！!!!");
+    },
+    onFaceDisappeared: () => {
+      console.log("顔を検出しませんでした");
+    }
+  })
+
+  return (
+    <div className="App">
+      <div className="streaming-console">
+        {isDev && <SidePanel />}
+        <main className="main-app-area">
+          <ModelContainer />
+          {isOpen && (
+            <WelcomeOverlay>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                始める
+              </button>
+            </WelcomeOverlay>
+          )}
+
+          <div className="main-app-area">
+            <video
+              className={cn("stream", {
+                hidden: !videoRef.current || !videoStream,
+              })}
+              ref={videoRef}
+              autoPlay
+              playsInline
+            />
+          </div>
+          <ControlTray
+            videoRef={videoRef as React.RefObject<HTMLVideoElement>}
+            supportsVideo={true}
+            onVideoStreamChange={setVideoStream}
+          />
+        </main>
+      </div>
+    </div>
+
+  );
+}
+
+function AppProvider() {
+  const { wsUrl } = useConfig();
+  const { user, signInAnonymousUser } = useAuth();
 
   useEffect(() => {
     // 初回マウント時に匿名ログインを実行
@@ -41,48 +93,14 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
+    <LiveAPIProvider url={wsUrl} userId={user?.uid}>
       <ExpressionProvider>
         <StreamingProvider>
-          <LiveAPIProvider url={wsUrl} userId={user?.uid}>
-            <div className="streaming-console">
-              {isDev && <SidePanel />}
-              <main className="main-app-area">
-                <ModelContainer />
-                {isOpen && (
-                  <WelcomeOverlay>
-                    <button
-                      type="button"
-                      onClick={() => setIsOpen(false)}
-                      className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                    >
-                      始める
-                    </button>
-                  </WelcomeOverlay>
-                )}
-
-                <div className="main-app-area">
-                  <video
-                    className={cn("stream", {
-                      hidden: !videoRef.current || !videoStream,
-                    })}
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                  />
-                </div>
-                <ControlTray
-                  videoRef={videoRef}
-                  supportsVideo={true}
-                  onVideoStreamChange={setVideoStream}
-                />
-              </main>
-            </div>
-          </LiveAPIProvider>
+          <App />
         </StreamingProvider>
       </ExpressionProvider>
-    </div>
+    </LiveAPIProvider>
   );
 }
 
-export default App;
+export default AppProvider;

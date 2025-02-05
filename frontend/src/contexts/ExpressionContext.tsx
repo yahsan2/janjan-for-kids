@@ -46,7 +46,11 @@ const expressionMap: Record<ExpressionKey, string> = {
 
 const ExpressionContext = createContext<ExpressionContextType | undefined>(undefined);
 
-export function ExpressionProvider({ children }: { children: ReactNode }) {
+export function ExpressionProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [expressionKey, setExpressionKey] = useState<ExpressionKey | null>(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +81,6 @@ export function ExpressionProvider({ children }: { children: ReactNode }) {
         .withFaceExpressions();
 
       if (detection) {
-        console.log("顔を検出:", detection);
         // 最も確率の高い表情を取得
         const expressions = detection.expressions;
         let maxExpression: ExpressionKey = "neutral";
@@ -171,10 +174,25 @@ export function ExpressionProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useExpression() {
+export function useExpression({ onFaceDetected, onFaceDisappeared }: { onFaceDetected?: () => void; onFaceDisappeared?: () => void } = {}) {
   const context = useContext(ExpressionContext);
+  const previousExpressionRef = useRef(context?.expressionKey);
   if (context === undefined) {
     throw new Error("useExpression must be used within an ExpressionProvider");
   }
+
+  useEffect(() => {
+    if (!context.expressionKey) return
+
+    const prevExpression = previousExpressionRef.current;
+    previousExpressionRef.current = context.expressionKey;
+
+    if (context.expressionKey === "noface") {
+      onFaceDisappeared?.();
+    } else if (prevExpression === "noface") {
+      onFaceDetected?.();
+    }
+  }, [context.expressionKey]);
+
   return context;
 }
