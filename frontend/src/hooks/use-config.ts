@@ -12,13 +12,16 @@ import { useMemo } from "react";
 
 interface Config {
   wsUrl: string;
+  isDev: boolean;
 }
 
 export function useConfig(): Config {
   return useMemo(() => {
     let wsUrl: string;
 
-    if (process.env.NODE_ENV === "development") {
+    const isDev = process.env.NODE_ENV === "development";
+
+    if (isDev) {
       // 開発環境の場合、ローカルのバックエンドURLを使用
       wsUrl = "ws://localhost:8000/ws";
     } else {
@@ -26,6 +29,6 @@ export function useConfig(): Config {
       wsUrl = "wss://janjan-for-kids-pijxwapxwq-uc.a.run.app/ws";
     }
 
-    return { wsUrl };
+    return { wsUrl, isDev };
   }, []);
 }

@@ -33,7 +33,7 @@ function App() {
   const [runId] = useState<string>(crypto.randomUUID());
   const { user, loading, signInAnonymousUser } = useAuth();
   const [isOpen, setIsOpen] = useState(true);
-  const { wsUrl } = useConfig();
+  const { wsUrl, isDev } = useConfig();
 
   useEffect(() => {
     // 初回マウント時に匿名ログインを実行
@@ -46,7 +46,7 @@ function App() {
         <StreamingProvider>
           <LiveAPIProvider url={wsUrl} userId={user?.uid}>
             <div className="streaming-console">
-              <SidePanel />
+              {isDev && <SidePanel />}
               <main className="main-app-area">
                 <ModelContainer />
                 {isOpen && (
