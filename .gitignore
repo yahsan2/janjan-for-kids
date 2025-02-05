@@ -4,6 +4,7 @@ build
 .firebase
 .dev.vars
 .env
+*.log
 .persist_vector_store
 .DS_Store
 
