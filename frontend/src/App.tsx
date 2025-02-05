@@ -16,7 +16,7 @@
 
 import "./App.scss";
 import cn from "classnames";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import ControlTray from "./components/control-tray/ControlTray";
 import SidePanel from "./components/side-panel/SidePanel";
 import { WelcomeOverlay } from "./components/welcome-overlay";
@@ -24,21 +24,27 @@ import { ExpressionProvider } from "./contexts/ExpressionContext";
 import { LiveAPIProvider } from "./contexts/LiveAPIContext";
 import { StreamingProvider } from "./contexts/StreamingContext";
 import { useConfig } from "./hooks/use-config";
+import { useAuth } from "./hooks/useAuth";
 import { ModelContainer } from "./components/model-viewer-container";
 
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const [runId] = useState<string>(crypto.randomUUID());
-  const [userId, setUserId] = useState<string>("user1");
+  const { user, loading, signInAnonymousUser } = useAuth();
   const [isOpen, setIsOpen] = useState(true);
   const { wsUrl } = useConfig();
+
+  useEffect(() => {
+    // 初回マウント時に匿名ログインを実行
+    signInAnonymousUser();
+  }, []);
 
   return (
     <div className="App">
       <ExpressionProvider>
         <StreamingProvider>
-          <LiveAPIProvider url={wsUrl} userId={userId}>
+          <LiveAPIProvider url={wsUrl} userId={user?.uid}>
             <div className="streaming-console">
               <SidePanel />
               <main className="main-app-area">
@@ -70,44 +76,6 @@ function App() {
                   supportsVideo={true}
                   onVideoStreamChange={setVideoStream}
                 />
-                <div
-                  className="url-setup"
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    pointerEvents: "auto",
-                    zIndex: 1000,
-                    padding: "2px",
-                    marginBottom: "2px",
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    background: "rgba(255, 255, 255, 0.9)",
-                  }}
-                >
-                  <div>
-                    <label htmlFor="user-id">User ID:</label>
-                    <input
-                      id="user-id"
-                      type="text"
-                      value={userId}
-                      onChange={(e) => setUserId(e.target.value)}
-                      placeholder="Enter user ID"
-                      style={{
-                        cursor: "text",
-                        padding: "4px",
-                        margin: "0 4px",
-                        borderRadius: "2px",
-                        border: "1px solid #ccc",
-                        fontSize: "14px",
-                        fontFamily: "system-ui, -apple-system, sans-serif",
-                        width: "100px",
-                      }}
-                    />
-                  </div>
-                </div>
               </main>
             </div>
           </LiveAPIProvider>
