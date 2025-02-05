@@ -83,24 +83,20 @@ tool_functions = {
 
 # Create tool declarations
 tools = [
-    Tool(
-        function_declarations=[
-            FunctionDeclaration.from_function(
-                client=genai_client,
-                func=retrieve_docs,
-            ),
-        ]
-    ),
+    # Tool(
+    #     function_declarations=[
+    #         FunctionDeclaration.from_function(
+    #             client=genai_client,
+    #             func=retrieve_docs,
+    #         ),
+    #     ]
+    # ),
     Tool(
         function_declarations=[
             FunctionDeclaration.from_function(
                 client=genai_client,
                 func=get_user_level,
-            )
-        ]
-    ),
-    Tool(
-        function_declarations=[
+            ),
             FunctionDeclaration.from_function(
                 client=genai_client,
                 func=set_user_name,
