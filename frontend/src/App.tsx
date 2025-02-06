@@ -35,8 +35,7 @@ function App() {
   const { isDev } = useConfig();
 
   const [isStarted, setIsStarted] = useState(false);
-  const { connect, disconnect, connected, getConnectionDuration, getDisconnectionDuration } = useLiveAPIContext();
-
+  const { connect, disconnect, connected, client, getDisconnectionDuration } = useLiveAPIContext();
 
   useExpression({
     onFaceDetected: () => {
@@ -55,7 +54,6 @@ function App() {
 
       // faceDisappearedの状態が 1分以上続いたら, 接続を切る
       const timeoutId = setTimeout(() => {
-        console.log("顔が消えてから1分経過したため、接続を切ります");
         disconnect();
       }, 60 * 1000);
 
@@ -67,6 +65,9 @@ function App() {
   const handleClickStartButton = () => {
     setIsStarted(true);
     connect();
+    setTimeout(() => {
+      client.send([{ text: "こんにちは！算数のお勉強をしましょう！" }]);
+    }, 1000)
   }
 
 
