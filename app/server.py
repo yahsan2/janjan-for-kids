@@ -163,7 +163,7 @@ def get_connect_and_run_callable(websocket: WebSocket) -> Callable:
     @backoff.on_exception(
         backoff.expo,
         ConnectionClosedError,
-        max_tries=5,
+        max_tries=1,
         max_time=30,
         on_backoff=on_backoff
     )
