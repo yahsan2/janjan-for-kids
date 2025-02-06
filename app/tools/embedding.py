@@ -1,4 +1,7 @@
+from typing import Dict
+from app.config import LOCATION, PROJECT_ID
 from app.vector_store import get_vector_store
+from app.templates import FORMAT_DOCS
 from langchain_google_vertexai import VertexAIEmbeddings
 
 EMBEDDING_MODEL = "text-embedding-004"
@@ -6,7 +9,11 @@ URLS = [
     "https://cloud.google.com/architecture/deploy-operate-generative-ai-applications"
 ]
 # Initialize vector store and retriever
-embedding = VertexAIEmbeddings(model_name=EMBEDDING_MODEL)
+embedding = VertexAIEmbeddings(
+    model_name=EMBEDDING_MODEL,
+    project=PROJECT_ID,  # プロジェクトIDを指定
+    location=LOCATION    # ロケーションを指定
+)
 vector_store = get_vector_store(embedding=embedding, urls=URLS)
 retriever = vector_store.as_retriever()
 
