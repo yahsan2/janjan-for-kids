@@ -285,10 +285,10 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
   /**
    * send normal content parts such as { text }
    */
-  send(parts: Part | Part[], turnComplete = true) {
+  send(parts: Part | Part[], { turnComplete = true, role = "user" }: { turnComplete?: boolean, role?: string } = {}) {
     parts = Array.isArray(parts) ? parts : [parts];
     const content: Content = {
-      role: "user",
+      role,
       parts,
     };
 

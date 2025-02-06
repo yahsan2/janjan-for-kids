@@ -26,13 +26,15 @@ import { StreamingProvider } from "./contexts/StreamingContext";
 import { useConfig } from "./hooks/use-config";
 import { useAuth } from "./hooks/use-auth";
 import { ModelContainer } from "./components/model-viewer-container";
-
+import { useFirestore } from "./hooks/use-firestore";
 
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const [runId] = useState<string>(crypto.randomUUID());
   const { isDev } = useConfig();
+  const { user } = useAuth();
+  const { userData, loading: userDataLoading, error } = useFirestore(user?.uid);
 
   const [isStarted, setIsStarted] = useState(false);
   const { connect, disconnect, connected, client, getDisconnectionDuration } = useLiveAPIContext();
@@ -60,13 +62,25 @@ function App() {
       // Clean up timeout if face is detected again
       return () => clearTimeout(timeoutId);
     }
+
   })
 
   const handleClickStartButton = () => {
     setIsStarted(true);
     connect();
     setTimeout(() => {
-      client.send([{ text: "こんにちは！算数のお勉強をしましょう！" }]);
+      if (user?.uid) {
+        let initialData = [`==ここからユーザー情報データ==`, `user_id: ${user.uid}`]
+        if (userData?.name) {
+          initialData.push(`name: ${userData.name}`)
+        }
+        initialData.push(`==ここまでユーザー情報データ==`)
+
+        client.send([
+          { text: initialData.join("\n") },
+          { text: "こんにちは！算数のお勉強をしましょう！" }
+        ]);
+      }
     }, 1000)
   }
 
@@ -80,9 +94,10 @@ function App() {
           {!isStarted && (
             <WelcomeOverlay>
               <button
+                disabled={userDataLoading}
                 type="button"
                 onClick={() => handleClickStartButton()}
-                className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                className="px-6 py-3 rounded-lg transition-colors bg-blue-500 hover:enabled:bg-blue-600 text-white disabled:bg-gray-400 disabled:text-gray-300 disabled:cursor-not-allowed"
               >
                 始める
               </button>
