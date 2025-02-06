@@ -66,7 +66,7 @@ function App() {
   })
 
   const handleClickStartButton = async () => {
-    if (!user?.uid) return
+    if (!user?.uid || connected) return
 
     await connect();
 
