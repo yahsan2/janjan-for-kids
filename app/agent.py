@@ -14,14 +14,13 @@
 
 import os
 from typing import Dict
+from app.tools.embedding import retrieve_docs
 from app.tools.firestore import get_user_level, set_user_name
 from dotenv import load_dotenv
 from app.templates import FORMAT_DOCS, SYSTEM_INSTRUCTION
-from app.vector_store import get_vector_store
 import google
 from google import genai
 from google.genai.types import Content, FunctionDeclaration, LiveConnectConfig, Tool
-from langchain_google_vertexai import VertexAIEmbeddings
 import vertexai
 
 # 環境変数を確実に読み込む
@@ -33,7 +32,6 @@ credentials, project = google.auth.default()
 # Constants
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", project)
 LOCATION = os.getenv("GOOGLE_CLOUD_REGION", "us-central1")
-EMBEDDING_MODEL = "text-embedding-004"
 
 if not PROJECT_ID or not LOCATION:
     raise ValueError(
@@ -41,9 +39,6 @@ if not PROJECT_ID or not LOCATION:
     )
 
 MODEL_ID = "gemini-2.0-flash-exp"
-URLS = [
-    "https://cloud.google.com/architecture/deploy-operate-generative-ai-applications"
-]
 
 vertexai.init(project=PROJECT_ID, location=LOCATION, credentials=credentials)
 genai_client = genai.Client(
@@ -52,27 +47,6 @@ genai_client = genai.Client(
     credentials=credentials,
     vertexai=True
 )
-
-# Initialize vector store and retriever
-embedding = VertexAIEmbeddings(model_name=EMBEDDING_MODEL)
-vector_store = get_vector_store(embedding=embedding, urls=URLS)
-retriever = vector_store.as_retriever()
-
-
-def retrieve_docs(query: str) -> Dict[str, str]:
-    """
-    Retrieves pre-formatted documents about MLOps (Machine Learning Operations),
-      Gen AI lifecycle, and production deployment best practices.
-
-    Args:
-        query: Search query string related to MLOps, Gen AI, or production deployment.
-
-    Returns:
-        A set of relevant, pre-formatted documents.
-    """
-    docs = retriever.invoke(query)
-    formatted_docs = FORMAT_DOCS.format(docs=docs)
-    return {"output": formatted_docs}
 
 
 tool_functions = {
