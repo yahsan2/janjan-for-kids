@@ -21,27 +21,54 @@ import ControlTray from "./components/control-tray/ControlTray";
 import SidePanel from "./components/side-panel/SidePanel";
 import { WelcomeOverlay } from "./components/welcome-overlay";
 import { ExpressionProvider, useExpression } from "./contexts/ExpressionContext";
-import { LiveAPIProvider } from "./contexts/LiveAPIContext";
+import { LiveAPIProvider, useLiveAPIContext } from "./contexts/LiveAPIContext";
 import { StreamingProvider } from "./contexts/StreamingContext";
 import { useConfig } from "./hooks/use-config";
 import { useAuth } from "./hooks/use-auth";
 import { ModelContainer } from "./components/model-viewer-container";
 
+
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const [runId] = useState<string>(crypto.randomUUID());
-  const [isOpen, setIsOpen] = useState(true);
   const { isDev } = useConfig();
+
+  const [isStarted, setIsStarted] = useState(false);
+  const { connect, disconnect, connected, getConnectionDuration, getDisconnectionDuration } = useLiveAPIContext();
+
 
   useExpression({
     onFaceDetected: () => {
-      console.log("顔を検出しました！!!!");
+      // 初回開始されていない場合、または、ws接続が継続中の場合、何もしない。
+      if (!isStarted || connected) return
+
+      const duration = getDisconnectionDuration();
+      // ws接続が切れた時間から、1分以上経っていたなら
+      if (duration > 15 * 60 * 1000) {
+        connect();
+      }
     },
     onFaceDisappeared: () => {
-      console.log("顔を検出しませんでした");
+      // 初回開始されていない場合、または、ws接続して”ない”場合、何もしない。
+      if (!isStarted || !connected) return
+
+      // faceDisappearedの状態が 1分以上続いたら, 接続を切る
+      const timeoutId = setTimeout(() => {
+        console.log("顔が消えてから1分経過したため、接続を切ります");
+        disconnect();
+      }, 60 * 1000);
+
+      // Clean up timeout if face is detected again
+      return () => clearTimeout(timeoutId);
     }
   })
+
+  const handleClickStartButton = () => {
+    setIsStarted(true);
+    connect();
+  }
+
 
   return (
     <div className="App">
@@ -49,11 +76,11 @@ function App() {
         {isDev && <SidePanel />}
         <main className="main-app-area">
           <ModelContainer />
-          {isOpen && (
+          {!isStarted && (
             <WelcomeOverlay>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => handleClickStartButton()}
                 className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
                 始める

@@ -34,6 +34,8 @@ export type UseLiveAPIResults = {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   volume: number;
+  getConnectionDuration: () => number;
+  getDisconnectionDuration: () => number;
 };
 
 export type UseLiveAPIProps = {
@@ -48,6 +50,8 @@ export function useLiveAPI({ url, userId }: UseLiveAPIProps): UseLiveAPIResults 
 
   const [connected, setConnected] = useState(false);
   const [volume, setVolume] = useState(0);
+  const [connectionStartTime, setConnectionStartTime] = useState<number | null>(null);
+  const [disconnectionTime, setDisconnectionTime] = useState<number | null>(null);
 
   // register audio for streaming server -> speakers
   useEffect(() => {
@@ -68,6 +72,7 @@ export function useLiveAPI({ url, userId }: UseLiveAPIProps): UseLiveAPIResults 
   useEffect(() => {
     const onClose = () => {
       setConnected(false);
+      setDisconnectionTime(Date.now());
     };
 
     const stopAudioStreamer = () => audioStreamerRef.current?.stop();
@@ -85,12 +90,27 @@ export function useLiveAPI({ url, userId }: UseLiveAPIProps): UseLiveAPIResults 
     client.disconnect();
     await client.connect();
     setConnected(true);
+    setConnectionStartTime(Date.now());
+    setDisconnectionTime(null);
   }, [client, setConnected]);
 
   const disconnect = useCallback(async () => {
     client.disconnect();
     setConnected(false);
+    setConnectionStartTime(null);
+    setDisconnectionTime(Date.now());
   }, [setConnected, client]);
+
+  const getConnectionDuration = useCallback(() => {
+    return connectionStartTime ? Date.now() - connectionStartTime : 0;
+  }, [connectionStartTime]);
+
+  /**
+   * 切断からの経過時間をミリ秒(ms)で取得
+   */
+  const getDisconnectionDuration = useCallback(() => {
+    return disconnectionTime ? Date.now() - disconnectionTime : 0;
+  }, [disconnectionTime]);
 
   return {
     client,
@@ -98,5 +118,13 @@ export function useLiveAPI({ url, userId }: UseLiveAPIProps): UseLiveAPIResults 
     connect,
     disconnect,
     volume,
+    /**
+     * 現在の接続時間をミリ秒(ms)で取得
+     */
+    getConnectionDuration,
+    /**
+     * 切断からの経過時間をミリ秒(ms)で取得
+     */
+    getDisconnectionDuration,
   };
 }
