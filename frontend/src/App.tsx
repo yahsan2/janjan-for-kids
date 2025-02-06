@@ -66,19 +66,20 @@ function App() {
   })
 
   const handleClickStartButton = async () => {
-    await connect();
-    if (user?.uid) {
-      let initialData = [`==ここからユーザー情報データ==`, `user_id: ${user.uid}`]
-      if (userData?.name) {
-        initialData.push(`name: ${userData.name}`)
-      }
-      initialData.push(`==ここまでユーザー情報データ==`)
+    if (!user?.uid) return
 
-      client.send([
-        { text: initialData.join("\n") },
-        { text: "こんにちは！算数のお勉強をしましょう！" }
-      ]);
+    await connect();
+
+    let initialData = [`==ここからユーザー情報データ==`, `user_id: ${user.uid}`]
+    if (userData?.name) {
+      initialData.push(`name: ${userData.name}`)
     }
+    initialData.push(`==ここまでユーザー情報データ==`)
+
+    client.send([
+      { text: initialData.join("\n") },
+      { text: "こんにちは！算数のお勉強をしましょう！" }
+    ]);
     setIsStarted(true);
   }
 
