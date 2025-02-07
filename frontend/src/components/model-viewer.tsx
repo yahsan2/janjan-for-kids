@@ -9,6 +9,7 @@ import type { ExpressionKey } from "../contexts/ExpressionContext";
 interface ModelViewerProps {
   className: string;
   expression: ExpressionKey | null;
+  volume: number;
 }
 
 // カメラの初期位置を定数として定義
@@ -44,7 +45,7 @@ const INITIAL_MODEL_ROTATION = {
   y: (-1 * Math.PI) / 4,
   z: 0,
 };
-export function ModelViewer({ className, expression }: ModelViewerProps) {
+export function ModelViewer({ className, expression, volume }: ModelViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -56,6 +57,10 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
   const timeRef = useRef<number>(0);
   const isHappyRef = useRef<boolean>(false);
   const isSadRef = useRef<boolean>(false);
+  // 話す動作の強さを保持する参照
+  const talkingAmplitudeRef = useRef<number>(0);
+  // 現在の音量を保持する参照
+  const volumeRef = useRef<number>(0);
 
   // カメラの現在の相対位置を保持する参照
   const cameraOffsetRef = useRef({ x: 0, y: 0, z: 0 });
@@ -144,6 +149,11 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
         break;
     }
   };
+
+  // volumeの値を更新
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
 
   // シーンのセットアップ（初回のみ）
   useEffect(() => {
@@ -258,24 +268,49 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
     function animate() {
       animationFrameRef.current = requestAnimationFrame(animate);
 
-      // Happyの時の跳ねるアニメーション
-      if (isHappyRef.current && modelRef.current) {
-        timeRef.current += 0.05;
-        const bounce = Math.sin(timeRef.current * 5) * 0.1;
-        modelRef.current.position.y = bounce + 0.2;
+      // 音量に応じた話す動作のアニメーション
+      if (modelRef.current && volumeRef.current > 0.02) {
+        timeRef.current += 0.05; // ゆっくりとした動き
+
+        const normalizedTime = (0.5 * timeRef.current) % (Math.PI * 2);
+
+        // 音量に応じて動きの大きさを調整 - ベースの振幅を大きく
+        talkingAmplitudeRef.current = 1 + volumeRef.current * 3; // 音量の影響を増加
+
+        // メインの縦方向の動き - 音量に大きく依存
+        const verticalMovement = Math.sin(normalizedTime) * talkingAmplitudeRef.current;
+
+        // 基本位置からの相対的な移動を適用
+        modelRef.current.position.y = INITIAL_MODEL_POSITION.y + verticalMovement;
+        modelRef.current.position.x = INITIAL_MODEL_POSITION.x;
+        modelRef.current.rotation.z = INITIAL_MODEL_ROTATION.z;
+
+        // 音量に応じて少し前後に傾ける（話しているような動き） - よりゆっくり
+        modelRef.current.rotation.x =
+          INITIAL_MODEL_ROTATION.x +
+          Math.sin(normalizedTime * 0.8) * (talkingAmplitudeRef.current * 0.3);
       }
+      // volume が 0 の場合は他のアニメーションを適用
+      else {
+        // Happyの時の跳ねるアニメーション
+        if (isHappyRef.current && modelRef.current) {
+          timeRef.current += 0.05;
+          const bounce = Math.sin(timeRef.current * 5) * 0.1;
+          modelRef.current.position.y = bounce + 0.2;
+        }
 
-      // Sadの時のジタバタアニメーション
-      if (isSadRef.current && modelRef.current) {
-        timeRef.current += 0.05;
-        // 小刻みな回転の揺れ
-        const wiggleRotation = Math.sin(timeRef.current * 15) * 0.1;
-        modelRef.current.rotation.z = Math.PI / 2 + wiggleRotation;
+        // Sadの時のジタバタアニメーション
+        if (isSadRef.current && modelRef.current) {
+          timeRef.current += 0.05;
+          // 小刻みな回転の揺れ
+          const wiggleRotation = Math.sin(timeRef.current * 15) * 0.1;
+          modelRef.current.rotation.z = Math.PI / 2 + wiggleRotation;
 
-        // 小刻みな位置の揺れ
-        const wigglePosition = Math.sin(timeRef.current * 20) * 0.05;
-        modelRef.current.position.x = wigglePosition;
-        modelRef.current.position.y = -0.1 + Math.abs(Math.sin(timeRef.current * 10) * 0.05);
+          // 小刻みな位置の揺れ
+          const wigglePosition = Math.sin(timeRef.current * 20) * 0.05;
+          modelRef.current.position.x = wigglePosition;
+          modelRef.current.position.y = -0.1 + Math.abs(Math.sin(timeRef.current * 10) * 0.05);
+        }
       }
 
       if (controlsRef.current) {
@@ -330,7 +365,7 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, []); // 依存配列を空にして初回のみ実行
+  }, []); // 初期化時のみ実行
 
   // 表情の更新
   useEffect(() => {
