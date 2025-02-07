@@ -32,23 +32,24 @@ function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const { isRecording } = useAudio();
-  const [runId] = useState<string>(crypto.randomUUID());
   const { isDev } = useConfig();
-  const { user, getIdToken } = useAuth();
-  const { userData, loading: userDataLoading, error } = useFirestore(user?.uid);
+  const { user, getIdToken, signInAnonymousUser } = useAuth();
+  const { userData, loading: userDataLoading } = useFirestore(user?.uid);
 
   const [isStarted, setIsStarted] = useState(false);
   const { connect, disconnect, connected, client, getDisconnectionDuration } = useLiveAPIContext();
 
   useExpression({
-    onFaceDetected: () => {
+    onFaceDetected: async () => {
       // 初回開始されていない場合、または、ws接続が継続中の場合、何もしない。
       if (!isStarted || connected) return;
 
       const duration = getDisconnectionDuration();
       // ws接続が切れた時間から、1分以上経っていたなら
       if (duration > 15 * 60 * 1000) {
-        connect();
+        await signInAnonymousUser();
+        const idToken = await getIdToken();
+        connect(idToken);
       }
     },
     onFaceDisappeared: () => {
@@ -71,16 +72,7 @@ function App() {
     const idToken = await getIdToken();
     await connect(idToken);
 
-    const initialData = ["==ここからユーザー情報データ==", `user_id: ${user.uid}`];
-    if (userData?.name) {
-      initialData.push(`name: ${userData.name}`);
-    }
-    initialData.push("==ここまでユーザー情報データ==");
-
-    client.send([
-      { text: initialData.join("\n") },
-      { text: "こんにちは！算数のお勉強をしましょう！" },
-    ]);
+    client.send([{ text: "こんにちは！算数のお勉強をしましょう！" }]);
     setIsStarted(true);
   };
 

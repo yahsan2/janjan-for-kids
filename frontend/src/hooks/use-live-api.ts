@@ -31,7 +31,7 @@ import VolMeterWorket from "../utils/worklets/vol-meter";
 export type UseLiveAPIResults = {
   client: MultimodalLiveClient;
   connected: boolean;
-  connect: () => Promise<void>;
+  connect: (idToken?: string) => Promise<void>;
   disconnect: () => Promise<void>;
   volume: number;
   getConnectionDuration: () => number;
