@@ -61,3 +61,76 @@ def set_user_name(user_id: str, name: str) -> Dict[str, str]:
         "name": name,
         "current_level": 1,
     }
+
+def upsert_math_question_result(user_id: str, question_id: str, is_correct: bool, question_text: str, answer: str, level: int) -> Dict[str, any]:
+    """
+    問題の回答結果を更新します。
+
+    Args:
+        user_id: ユーザーの識別子
+        question_id: 問題のID
+        is_correct: 正解かどうか
+        question_text: 問題文
+        answer: 正解の答え
+        level: 問題のレベル
+
+    Returns:
+        Dict with updated question information
+    """
+    doc_ref = db.collection('users').document(user_id).collection('mathQuestions').document(question_id)
+    doc = doc_ref.get()
+
+    if not doc.exists:
+        # 問題が存在しない場合は新規作成
+        data = {
+            'questionText': question_text,
+            'answer': answer,
+            'level': level,
+            'correctCount': 1 if is_correct else 0,
+            'wrongCount': 0 if is_correct else 1,
+        }
+        doc_ref.set(data)
+        return data
+
+    # 既存の問題データを更新
+    data = doc.to_dict()
+    # 問題文、回答、レベルは既存のものを保持
+    if is_correct:
+        data['correctCount'] = data.get('correctCount', 0) + 1
+    else:
+        data['wrongCount'] = data.get('wrongCount', 0) + 1
+
+    doc_ref.update(data)
+    return data
+
+def get_math_question_stats(user_id: str, question_id: str) -> Dict[str, any]:
+    """
+    問題の統計情報を取得します。
+
+    Args:
+        user_id: ユーザーの識別子
+        question_id: 問題のID
+
+    Returns:
+        Dict with question statistics and information
+    """
+    doc_ref = db.collection('users').document(user_id).collection('mathQuestions').document(question_id)
+    doc = doc_ref.get()
+
+    if not doc.exists:
+        return {
+            'questionText': '',
+            'answer': '',
+            'level': 1,
+            'correctCount': 0,
+            'wrongCount': 0,
+        }
+
+    data = doc.to_dict()
+    return {
+        'questionText': data.get('questionText', ''),
+        'answer': data.get('answer', ''),
+        'level': data.get('level', 1),
+        'correctCount': data.get('correctCount', 0),
+        'wrongCount': data.get('wrongCount', 0),
+    }
