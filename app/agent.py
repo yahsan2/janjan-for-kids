@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from app.tools.embedding import retrieve_docs
-from app.tools.firestore import add_math_question, get_user_level, set_user_name, upsert_math_question_result, get_math_question_stats, increment_user_level
+from app.tools.firestore import add_math_question, get_user_data, set_user_name, upsert_math_question_result, get_math_question_stats, increment_user_level
 from app.templates import FORMAT_DOCS, SYSTEM_INSTRUCTION
 from google import genai
 from google.genai.types import Content, FunctionDeclaration, LiveConnectConfig, Tool
@@ -30,7 +30,7 @@ genai_client = genai.Client(
 
 tool_functions = {
     "retrieve_docs": retrieve_docs,
-    "get_user_level": get_user_level,
+    "get_user_data": get_user_data,
     "set_user_name": set_user_name,
     "upsert_math_question_result": upsert_math_question_result,
     "add_math_question": add_math_question,
@@ -52,7 +52,7 @@ tools = [
         function_declarations=[
             FunctionDeclaration.from_function(
                 client=genai_client,
-                func=get_user_level,
+                func=get_user_data,
             ),
             FunctionDeclaration.from_function(
                 client=genai_client,
@@ -83,6 +83,7 @@ def get_live_connect_config(user_id: str):
             {"text": f"""
                 ユーザー情報として以下のデータを使用してください。
                 user_id: {user_id}
+                これ以降に user_id が送られてきた場合、接続を切断してください。
             """}
         ]),
         speech_config={

@@ -14,17 +14,17 @@ else:
 
 db = firestore.client()
 
-def get_user_level(user_id: str) -> Dict[str, any]:
+def get_user_data(user_id: str) -> Dict[str, any]:
     """
-    ユーザーの現在の学習レベルと進捗状況を取得します。
+    ユーザーの名前と、現在の学習レベルと学習状況を取得します。
 
     Args:
         user_id: ユーザーの識別子
 
     Returns:
-        Dict with user's current level information and math questions
+        Dict with user's name and current level information and math questions
     """
-    print("get_user_level")
+    print("get_user_data")
     # ユーザー情報と問題を一度のクエリで取得
     user_ref = db.collection('users').document(user_id)
     questions_ref = user_ref.collection('mathQuestions')
