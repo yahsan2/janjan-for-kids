@@ -35,11 +35,7 @@ def get_user_data(user_id: str) -> Dict[str, any]:
         user_doc = user_ref.get(transaction=transaction)
 
         if not user_doc.exists:
-            return {
-                "name": "ゲスト",
-                "current_level": 1,
-                "questions": []
-            }
+            return None
 
         user_data = user_doc.to_dict()
         current_level = user_data.get('current_level', 1)
