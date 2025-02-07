@@ -1,5 +1,5 @@
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { type SetStateAction, useEffect, useState } from "react";
 import { db } from "../config/firebase";
 import { useAuth } from "./use-auth";
 
@@ -29,26 +29,45 @@ export const useMathQuestions = () => {
 
       try {
         const mathQuestionsRef = collection(db, `users/${user.uid}/mathQuestions`);
-        const q = query(mathQuestionsRef, orderBy("createdAt", "asc"));
-        const querySnapshot = await getDocs(q);
+        const q = query(
+          mathQuestionsRef,
+          where("correctCount", "==", 0),
+          where("createdAt", ">=", new Date(Date.now() - 15 * 60 * 1000)),
+          orderBy("createdAt", "desc")
+        );
 
-        const questions = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            ...data,
-            // FirestoreのタイムスタンプをネイティブのDateオブジェクトに変換
-            createdAt: data.createdAt?.toDate() || new Date(),
-          };
-        }) as MathQuestion[];
+        const unsubscribe = onSnapshot(
+          q,
+          // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+          (snapshot: { docs: { data: () => any; id: any }[] }) => {
+            // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+            const questions = snapshot.docs.map((doc: { data: () => any; id: any }) => {
+              const data = doc.data();
+              return {
+                id: doc.id,
+                ...data,
+                // FirestoreのタイムスタンプをネイティブのDateオブジェクトに変換
+                createdAt: data.createdAt?.toDate() || new Date(),
+              };
+            }) as MathQuestion[];
+            setMathQuestions(questions);
+            setError(null);
+            setLoading(false);
+          },
+          (err: SetStateAction<Error | null>) => {
+            // biome-ignore lint/suspicious/noConsole: <explanation>
+            console.error("Error fetching math questions:", err);
+            setError(err instanceof Error ? err : new Error("Failed to fetch math questions"));
+            setLoading(false);
+          }
+        );
 
-        console.log("Fetched math questions:", questions);
-        setMathQuestions(questions);
-        setError(null);
+        // Cleanup subscription on unmount
+        return () => unsubscribe();
       } catch (err) {
-        console.error("Error fetching math questions:", err);
-        setError(err instanceof Error ? err : new Error("Failed to fetch math questions"));
-      } finally {
+        // biome-ignore lint/suspicious/noConsole: <explanation>
+        console.error("Error setting up snapshot:", err);
+        setError(err instanceof Error ? err : new Error("Failed to setup snapshot"));
         setLoading(false);
       }
     };
