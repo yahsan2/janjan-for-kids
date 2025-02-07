@@ -16,7 +16,7 @@ db = firestore.client()
 
 def get_user_data(user_id: str) -> Dict[str, any]:
     """
-    ユーザーの名前と、現在の学習レベルと学習状況を取得します。
+    [[ユーザーデータ取得関数]]ユーザーの名前と、現在の学習レベルと学習状況を取得します。
 
     Args:
         user_id: ユーザーの識別子
@@ -67,7 +67,7 @@ def get_user_data(user_id: str) -> Dict[str, any]:
 
 def set_user_name(user_id: str, name: str) -> Dict[str, str]:
     """
-    ユーザーの名前を設定します。
+    [[ユーザー名保存関数]]ユーザーの名前を設定します。
 
     Args:
         user_id: ユーザーの識別子
@@ -87,13 +87,14 @@ def set_user_name(user_id: str, name: str) -> Dict[str, str]:
         "current_level": 1,
     }
 
-def add_math_question(user_id: str, question_text: str, answer: str, level: int) -> Dict[str, any]:
+def add_math_question(user_id: str, question_text: str, formula: str, answer: str, level: int) -> Dict[str, any]:
     """
-    新しい数学の問題を追加します。
+    [[問題追加関数]]新しい数学の問題を追加します。
 
     Args:
         user_id: ユーザーの識別子
-        question_text: 問題文（例：「りんごが3個あって、そこにお友達から2個もらったら全部でいくつになるかな？」）
+        question_text: 問題文（例：りんごが3個あって、そこにお友達から2個もらったら全部でいくつになるかな？）
+        formula: 計算式（例：3 + 2 = ?）
         answer: 正解の答え
         level: 問題のレベル
 
@@ -106,6 +107,7 @@ def add_math_question(user_id: str, question_text: str, answer: str, level: int)
         'questionText': question_text,
         'answer': answer,
         'level': level,
+        'formula': formula,
         'correctCount': 0,
         'wrongCount': 0,
     }
@@ -113,15 +115,16 @@ def add_math_question(user_id: str, question_text: str, answer: str, level: int)
     data['id'] = doc_ref.id
     return data
 
-def upsert_math_question_result(user_id: str, question_id: str, is_correct: bool, question_text: str, answer: str, level: int) -> Dict[str, any]:
+def upsert_math_question_result(user_id: str, question_id: str, is_correct: bool, formula: str, question_text: str, answer: str, level: int) -> Dict[str, any]:
     """
-    問題の回答結果を更新します。
+    [[問題更新関数]]問題の回答結果を更新します。
 
     Args:
         user_id: ユーザーの識別子
         question_id: 問題のID
         is_correct: 正解かどうか
         question_text: 問題文（例：「りんごが3個あって、そこにお友達から2個もらったら全部でいくつになるかな？」）
+        formula: 計算式（例：3 + 2 = ?）
         answer: 正解の答え
         level: 問題のレベル
 
@@ -137,6 +140,7 @@ def upsert_math_question_result(user_id: str, question_id: str, is_correct: bool
             'questionText': question_text,
             'answer': answer,
             'level': level,
+            'formula': formula,
             'correctCount': 1 if is_correct else 0,
             'wrongCount': 0 if is_correct else 1,
         }
