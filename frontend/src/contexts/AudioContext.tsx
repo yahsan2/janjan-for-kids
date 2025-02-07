@@ -1,4 +1,4 @@
-import { type ReactNode, createContext, useCallback, useContext, useState } from "react";
+import { type ReactNode, createContext, useCallback, useContext, useRef, useState } from "react";
 import { AudioRecorder } from "../utils/audio-recorder";
 
 interface AudioContextType {
@@ -19,12 +19,25 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [volume, setVolume] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [audioRecorder] = useState(() => new AudioRecorder());
+  const lastVolumeUpdateTime = useRef(0);
+  const lastVolumeValue = useRef(0);
+
+  const throttledSetVolume = useCallback((newVolume: number) => {
+    const now = Date.now();
+    const volumeDiff = Math.abs(newVolume - lastVolumeValue.current);
+
+    // 一定のボリュームがあるか、音量が10%以上変化した場合のみ更新
+    if (newVolume > 0.01 || volumeDiff > 0.25) {
+      setVolume(newVolume);
+      lastVolumeValue.current = newVolume;
+    }
+    lastVolumeUpdateTime.current = now;
+  }, []);
 
   const startRecording = useCallback(async () => {
     try {
-      // 音量の監視を設定
       audioRecorder.on("volume", (newVolume: number) => {
-        setVolume(newVolume);
+        throttledSetVolume(newVolume);
       });
 
       await audioRecorder.start();
@@ -35,7 +48,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       setError("マイクの起動に失敗しました。マイクへのアクセスを許可してください。");
       setIsRecording(false); // エラー時にisRecordingをfalseに設定
     }
-  }, [audioRecorder]);
+  }, [audioRecorder, throttledSetVolume]);
 
   const stopRecording = useCallback(() => {
     try {
