@@ -71,11 +71,11 @@ function App() {
 
     await connect();
 
-    const initialData = [`==ここからユーザー情報データ==`, `user_id: ${user.uid}`];
+    const initialData = ["==ここからユーザー情報データ==", `user_id: ${user.uid}`];
     if (userData?.name) {
       initialData.push(`name: ${userData.name}`);
     }
-    initialData.push(`==ここまでユーザー情報データ==`);
+    initialData.push("==ここまでユーザー情報データ==");
 
     client.send([
       { text: initialData.join("\n") },
