@@ -27,6 +27,7 @@ import { StreamingProvider } from "./contexts/StreamingContext";
 import { useAuth } from "./hooks/use-auth";
 import { useConfig } from "./hooks/use-config";
 import { useFirestore } from "./hooks/use-firestore";
+import { useMathQuestions } from "./hooks/use-math-questions";
 
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -35,6 +36,7 @@ function App() {
   const { isDev } = useConfig();
   const { user, getIdToken, signInAnonymousUser } = useAuth();
   const { userData, loading: userDataLoading } = useFirestore(user?.uid);
+  const { mathQuestions } = useMathQuestions();
 
   const [isStarted, setIsStarted] = useState(false);
   const { connect, disconnect, connected, client, getDisconnectionDuration } = useLiveAPIContext();
@@ -85,6 +87,13 @@ function App() {
           supportsVideo={true}
           onVideoStreamChange={setVideoStream}
         />
+        {isStarted && mathQuestions[0] && (
+          <div className="fixed inset-0">
+            <div className="space-y-2">
+              <p>{mathQuestions[0].questionText}</p>
+            </div>
+          </div>
+        )}
         {!isStarted && (
           <WelcomeOverlay className="fixed inset-0">
             <div className="space-y-2">
