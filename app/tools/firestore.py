@@ -110,6 +110,8 @@ def add_math_question(user_id: str, question_text: str, formula: str, answer: st
         'formula': formula,
         'correctCount': 0,
         'wrongCount': 0,
+        'createdAt': firestore.SERVER_TIMESTAMP,
+        'updatedAt': firestore.SERVER_TIMESTAMP,
     }
     doc_ref.set(data)
     data['id'] = doc_ref.id
@@ -143,6 +145,8 @@ def upsert_math_question_result(user_id: str, question_id: str, is_correct: bool
             'formula': formula,
             'correctCount': 1 if is_correct else 0,
             'wrongCount': 0 if is_correct else 1,
+            'createdAt': firestore.SERVER_TIMESTAMP,
+            'updatedAt': firestore.SERVER_TIMESTAMP,
         }
         doc_ref.set(data)
         return data
@@ -154,6 +158,7 @@ def upsert_math_question_result(user_id: str, question_id: str, is_correct: bool
         data['correctCount'] = data.get('correctCount', 0) + 1
     else:
         data['wrongCount'] = data.get('wrongCount', 0) + 1
+    data['updatedAt'] = firestore.SERVER_TIMESTAMP
 
     doc_ref.update(data)
     return data
