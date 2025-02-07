@@ -34,7 +34,7 @@ const INITIAL_MODEL_SCALE = {
 
 // モデルの初期位置を定数として定義
 const INITIAL_MODEL_POSITION = {
-  x: 2,
+  x: 2.5,
   y: -0.75,
   z: 2,
 };
