@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from app.tools.embedding import retrieve_docs
-from app.tools.firestore import get_user_level, set_user_name, upsert_math_question_result, get_math_question_stats
+from app.tools.firestore import add_math_question, get_user_level, set_user_name, upsert_math_question_result, get_math_question_stats, increment_user_level
 from app.templates import FORMAT_DOCS, SYSTEM_INSTRUCTION
 from google import genai
 from google.genai.types import Content, FunctionDeclaration, LiveConnectConfig, Tool
@@ -33,7 +33,9 @@ tool_functions = {
     "get_user_level": get_user_level,
     "set_user_name": set_user_name,
     "upsert_math_question_result": upsert_math_question_result,
+    "add_math_question": add_math_question,
     "get_math_question_stats": get_math_question_stats,
+    "increment_user_level": increment_user_level,
 }
 
 # Create tool declarations
@@ -59,6 +61,14 @@ tools = [
             FunctionDeclaration.from_function(
                 client=genai_client,
                 func=upsert_math_question_result,
+            ),
+            FunctionDeclaration.from_function(
+                client=genai_client,
+                func=get_math_question_stats,
+            ),
+            FunctionDeclaration.from_function(
+                client=genai_client,
+                func=increment_user_level,
             ),
         ]
     ),
