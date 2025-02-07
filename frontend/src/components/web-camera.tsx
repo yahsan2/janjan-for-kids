@@ -52,8 +52,8 @@ export function WebCamera({ className }: { className: string }) {
       {error ? (
         <div className="py-2 px-4 bg-red-100 text-red-700 rounded text-sm">{error}</div>
       ) : (
-        <div className="py-2 px-4 bg-blue-100 text-blue-700 rounded text-sm">
-          映像データは、顔の認識のみ利用し、本サービスのサーバー含む外部には送信しません。
+        <div className="py-2 px-4 bg-blue-100 text-blue-700 rounded text-xs">
+          映像データはブラウザ上での顔認識でのみ利用し、本サービスのサーバー含む外部には送信しません。
         </div>
       )}
     </div>
