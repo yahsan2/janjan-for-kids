@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import React from "react";
 import { useExpression } from "../contexts/ExpressionContext";
 import { useStreaming } from "../contexts/StreamingContext";
 
