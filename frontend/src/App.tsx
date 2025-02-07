@@ -72,10 +72,10 @@ function App() {
   const handleClickStartButton = async () => {
     if (!user?.uid || connected) return;
 
-    // const idToken = await getIdToken();
-    // await connect(idToken);
+    const idToken = await getIdToken();
+    await connect(idToken);
 
-    // client.send([{ text: "こんにちは！算数のお勉強をしましょう！" }]);
+    client.send([{ text: "こんにちは！算数のお勉強をしましょう！" }]);
     setIsStarted(true);
   };
 
