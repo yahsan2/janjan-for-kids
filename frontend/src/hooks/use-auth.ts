@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { signInAnonymously, onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { type User, onAuthStateChanged, signInAnonymously } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { auth } from "../config/firebase";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -23,9 +23,17 @@ export const useAuth = () => {
       setUser(result.user);
       return result.user;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred during sign in');
+      setError(err instanceof Error ? err.message : "An error occurred during sign in");
       return null;
     }
+  };
+
+  const getIdToken = async () => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new Error("No authenticated user found");
+    }
+    return await currentUser.getIdToken();
   };
 
   return {
@@ -33,5 +41,6 @@ export const useAuth = () => {
     loading,
     error,
     signInAnonymousUser,
+    getIdToken,
   };
 };

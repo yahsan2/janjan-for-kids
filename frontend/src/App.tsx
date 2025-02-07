@@ -35,7 +35,7 @@ function App() {
   const { isRecording } = useAudio();
   const [runId] = useState<string>(crypto.randomUUID());
   const { isDev } = useConfig();
-  const { user } = useAuth();
+  const { user, getIdToken } = useAuth();
   const { userData, loading: userDataLoading, error } = useFirestore(user?.uid);
 
   const [isStarted, setIsStarted] = useState(false);
@@ -69,7 +69,8 @@ function App() {
   const handleClickStartButton = async () => {
     if (!user?.uid || connected) return;
 
-    await connect();
+    const idToken = await getIdToken();
+    await connect(idToken);
 
     const initialData = ["==ここからユーザー情報データ==", `user_id: ${user.uid}`];
     if (userData?.name) {

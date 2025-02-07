@@ -18,7 +18,8 @@ import json
 import logging
 from typing import Any, Callable, Dict, Literal, Optional, Union
 
-from app.agent import MODEL_ID, genai_client, live_connect_config, tool_functions
+from app.agent import MODEL_ID, genai_client, get_live_connect_config, tool_functions
+from firebase_admin import auth
 import backoff
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
@@ -145,7 +146,7 @@ class GeminiSession:
                 break
 
 
-def get_connect_and_run_callable(websocket: WebSocket) -> Callable:
+def get_connect_and_run_callable(websocket: WebSocket, user_id: str) -> Callable:
     """Create a callable that handles Gemini connection with retry logic.
 
     Args:
@@ -168,8 +169,9 @@ def get_connect_and_run_callable(websocket: WebSocket) -> Callable:
         on_backoff=on_backoff
     )
     async def connect_and_run() -> None:
+        config = get_live_connect_config(user_id)
         async with genai_client.aio.live.connect(
-            model=MODEL_ID, config=live_connect_config
+            model=MODEL_ID, config=config
         ) as session:
             await websocket.send_json({"status": "Backend is ready for conversation"})
             gemini_session = GeminiSession(
@@ -185,12 +187,14 @@ def get_connect_and_run_callable(websocket: WebSocket) -> Callable:
 
 
 @app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket) -> None:
+async def websocket_endpoint(websocket: WebSocket, id_token: str = None) -> None:
     """Handle new websocket connections."""
     gemini_session = None
     try:
         await websocket.accept()
-        connect_and_run = get_connect_and_run_callable(websocket)
+        decoded_token = auth.verify_id_token(id_token)
+        uid = decoded_token['uid']
+        connect_and_run = get_connect_and_run_callable(websocket, uid)
         await connect_and_run()
     finally:
         if gemini_session:

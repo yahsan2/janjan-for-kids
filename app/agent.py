@@ -74,15 +74,22 @@ tools = [
     ),
 ]
 
-live_connect_config = LiveConnectConfig(
-    response_modalities=["AUDIO"],
-    tools=tools,
-    system_instruction=Content(parts=[{"text": SYSTEM_INSTRUCTION}]),
-    speech_config={
-        "voice_config": {
-            "prebuilt_voice_config": {
-                "voice_name": "Aoede"
+def get_live_connect_config(user_id: str):
+    return LiveConnectConfig(
+        response_modalities=["AUDIO"],
+        tools=tools,
+        system_instruction=Content(parts=[
+            {"text": SYSTEM_INSTRUCTION},
+            {"text": f"""
+                ユーザー情報として以下のデータを使用してください。
+                user_id: {user_id}
+            """}
+        ]),
+        speech_config={
+            "voice_config": {
+                "prebuilt_voice_config": {
+                    "voice_name": "Aoede"
+                }
             }
         }
-    }
-)
+    )

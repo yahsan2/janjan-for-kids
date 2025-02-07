@@ -91,7 +91,7 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
   }
 
   connect(newRunId?: string): Promise<boolean> {
-    const ws = new WebSocket(this.url);
+    const ws = new WebSocket(`${this.url}?id_token=${newRunId}`);
 
     // Update runId if provided
     if (newRunId) {
@@ -285,7 +285,10 @@ export class MultimodalLiveClient extends EventEmitter<MultimodalLiveClientEvent
   /**
    * send normal content parts such as { text }
    */
-  send(parts: Part | Part[], { turnComplete = true, role = "user" }: { turnComplete?: boolean, role?: string } = {}) {
+  send(
+    parts: Part | Part[],
+    { turnComplete = true, role = "user" }: { turnComplete?: boolean; role?: string } = {}
+  ) {
     parts = Array.isArray(parts) ? parts : [parts];
     const content: Content = {
       role,

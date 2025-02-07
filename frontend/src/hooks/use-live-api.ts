@@ -86,13 +86,16 @@ export function useLiveAPI({ url, userId }: UseLiveAPIProps): UseLiveAPIResults 
     };
   }, [client]);
 
-  const connect = useCallback(async () => {
-    client.disconnect();
-    await client.connect();
-    setConnected(true);
-    setConnectionStartTime(Date.now());
-    setDisconnectionTime(null);
-  }, [client, setConnected]);
+  const connect = useCallback(
+    async (idToken?: string) => {
+      client.disconnect();
+      await client.connect(idToken);
+      setConnected(true);
+      setConnectionStartTime(Date.now());
+      setDisconnectionTime(null);
+    },
+    [client, setConnected]
+  );
 
   const disconnect = useCallback(async () => {
     client.disconnect();
