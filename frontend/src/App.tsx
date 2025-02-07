@@ -16,16 +16,16 @@
 
 import "./App.scss";
 import cn from "classnames";
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import ControlTray from "./components/control-tray/ControlTray";
+import { ModelContainer } from "./components/model-viewer-container";
 import SidePanel from "./components/side-panel/SidePanel";
 import { WelcomeOverlay } from "./components/welcome-overlay";
 import { ExpressionProvider, useExpression } from "./contexts/ExpressionContext";
 import { LiveAPIProvider, useLiveAPIContext } from "./contexts/LiveAPIContext";
 import { StreamingProvider } from "./contexts/StreamingContext";
-import { useConfig } from "./hooks/use-config";
 import { useAuth } from "./hooks/use-auth";
-import { ModelContainer } from "./components/model-viewer-container";
+import { useConfig } from "./hooks/use-config";
 import { useFirestore } from "./hooks/use-firestore";
 
 function App() {
@@ -42,7 +42,7 @@ function App() {
   useExpression({
     onFaceDetected: () => {
       // 初回開始されていない場合、または、ws接続が継続中の場合、何もしない。
-      if (!isStarted || connected) return
+      if (!isStarted || connected) return;
 
       const duration = getDisconnectionDuration();
       // ws接続が切れた時間から、1分以上経っていたなら
@@ -52,7 +52,7 @@ function App() {
     },
     onFaceDisappeared: () => {
       // 初回開始されていない場合、または、ws接続して”ない”場合、何もしない。
-      if (!isStarted || !connected) return
+      if (!isStarted || !connected) return;
 
       // faceDisappearedの状態が 1分以上続いたら, 接続を切る
       const timeoutId = setTimeout(() => {
@@ -61,28 +61,26 @@ function App() {
 
       // Clean up timeout if face is detected again
       return () => clearTimeout(timeoutId);
-    }
-
-  })
+    },
+  });
 
   const handleClickStartButton = async () => {
-    if (!user?.uid || connected) return
+    if (!user?.uid || connected) return;
 
     await connect();
 
-    let initialData = [`==ここからユーザー情報データ==`, `user_id: ${user.uid}`]
+    const initialData = [`==ここからユーザー情報データ==`, `user_id: ${user.uid}`];
     if (userData?.name) {
-      initialData.push(`name: ${userData.name}`)
+      initialData.push(`name: ${userData.name}`);
     }
-    initialData.push(`==ここまでユーザー情報データ==`)
+    initialData.push(`==ここまでユーザー情報データ==`);
 
     client.send([
       { text: initialData.join("\n") },
-      { text: "こんにちは！算数のお勉強をしましょう！" }
+      { text: "こんにちは！算数のお勉強をしましょう！" },
     ]);
     setIsStarted(true);
-  }
-
+  };
 
   return (
     <div className="App">
@@ -102,7 +100,6 @@ function App() {
               </button>
             </WelcomeOverlay>
           )}
-
           <div className="main-app-area">
             <video
               className={cn("stream", {
@@ -121,7 +118,6 @@ function App() {
         </main>
       </div>
     </div>
-
   );
 }
 
