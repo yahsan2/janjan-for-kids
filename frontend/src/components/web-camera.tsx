@@ -1,7 +1,7 @@
+import c from "classnames";
 import { useEffect, useRef } from "react";
 import { useExpression } from "../contexts/ExpressionContext";
 import { useStreaming } from "../contexts/StreamingContext";
-
 export function WebCamera({ className }: { className: string }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const {
@@ -27,30 +27,35 @@ export function WebCamera({ className }: { className: string }) {
   }, [registerDisplayVideo, unregisterDisplayVideo]);
 
   return (
-    <div className={className}>
-      <div className="mb-4 space-x-4">
+    <div className={c("space-y-4", className)}>
+      <div className="flex gap-4 items-center">
         <button
           type="button"
           onClick={isStreaming ? stopCamera : startCamera}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          disabled={!isModelLoaded}
+          className="rounded-xl px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 transition-colors flex items-center gap-2"
         >
-          {isStreaming ? "カメラを停止" : "カメラを有効にする"}
+          <span className="material-symbols-outlined filled">videocam</span>
+          {isStreaming ? "カメラを停止する" : "カメラを有効にする"}
         </button>
-      </div>
-      {error && <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">{error}</div>}
-      <div>
-        <h3 className="text-lg font-semibold mb-2">表情認識</h3>
         <video
           ref={videoRef}
           autoPlay
           playsInline
-          className="w-full rounded-lg shadow-lg"
+          className={c("w-1/3 rounded-lg shadow-lg", {
+            hidden: !isStreaming,
+          })}
           aria-label="カメラのプレビュー"
         >
           <track kind="captions" />
         </video>
       </div>
+      {error ? (
+        <div className="py-2 px-4 bg-red-100 text-red-700 rounded text-sm">{error}</div>
+      ) : (
+        <div className="py-2 px-4 bg-blue-100 text-blue-700 rounded text-sm">
+          映像データは、顔の認識のみ利用し、本サービスのサーバー含む外部には送信しません。
+        </div>
+      )}
     </div>
   );
 }

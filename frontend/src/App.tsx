@@ -21,6 +21,7 @@ import ControlTray from "./components/control-tray/ControlTray";
 import { ModelContainer } from "./components/model-viewer-container";
 import SidePanel from "./components/side-panel/SidePanel";
 import { WelcomeOverlay } from "./components/welcome-overlay";
+import { AudioProvider, useAudio } from "./contexts/AudioContext";
 import { ExpressionProvider, useExpression } from "./contexts/ExpressionContext";
 import { LiveAPIProvider, useLiveAPIContext } from "./contexts/LiveAPIContext";
 import { StreamingProvider } from "./contexts/StreamingContext";
@@ -31,6 +32,7 @@ import { useFirestore } from "./hooks/use-firestore";
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
+  const { isRecording } = useAudio();
   const [runId] = useState<string>(crypto.randomUUID());
   const { isDev } = useConfig();
   const { user } = useAuth();
@@ -91,7 +93,7 @@ function App() {
           {!isStarted && (
             <WelcomeOverlay>
               <button
-                disabled={userDataLoading}
+                disabled={userDataLoading || !isRecording}
                 type="button"
                 onClick={() => handleClickStartButton()}
                 className="px-6 py-3 rounded-lg transition-colors bg-blue-500 hover:enabled:bg-blue-600 text-white disabled:bg-gray-400 disabled:text-gray-300 disabled:cursor-not-allowed"
@@ -134,7 +136,9 @@ function AppProvider() {
     <LiveAPIProvider url={wsUrl} userId={user?.uid}>
       <ExpressionProvider>
         <StreamingProvider>
-          <App />
+          <AudioProvider>
+            <App />
+          </AudioProvider>
         </StreamingProvider>
       </ExpressionProvider>
     </LiveAPIProvider>
