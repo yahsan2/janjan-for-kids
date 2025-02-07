@@ -20,7 +20,7 @@ import { RiSidebarFoldLine, RiSidebarUnfoldLine } from "react-icons/ri";
 import Select from "react-select";
 import { useLiveAPIContext } from "../../contexts/LiveAPIContext";
 import { useLoggerStore } from "../../utils/store-logger";
-import Logger, { LoggerFilterType } from "../logger/Logger";
+import Logger, { type LoggerFilterType } from "../logger/Logger";
 import "./side-panel.scss";
 
 const filterOptions = [
@@ -29,7 +29,7 @@ const filterOptions = [
   { value: "none", label: "All" },
 ];
 
-export default function SidePanel() {
+export default function SidePanel({ className }: { className?: string }) {
   const { connected, client } = useLiveAPIContext();
   const [open, setOpen] = useState(true);
   const loggerRef = useRef<HTMLDivElement>(null);
@@ -73,7 +73,7 @@ export default function SidePanel() {
   };
 
   return (
-    <div className={`side-panel ${open ? "open" : ""}`}>
+    <div className={cn(`side-panel ${open ? "open" : ""}`, className)}>
       <header className="top">
         <h2>Console</h2>
         {open ? (

@@ -15,7 +15,6 @@
  */
 
 import "./App.scss";
-import cn from "classnames";
 import { useEffect, useRef, useState } from "react";
 import ControlTray from "./components/control-tray/ControlTray";
 import { ModelContainer } from "./components/model-viewer-container";
@@ -88,42 +87,30 @@ function App() {
   return (
     <div className="App">
       <div className="streaming-console">
-        {isDev && <SidePanel />}
-        <main className="main-app-area">
-          <ModelContainer />
-          {!isStarted && (
-            <WelcomeOverlay>
-              <div className="space-y-2">
-                <button
-                  disabled={userDataLoading || !isRecording}
-                  type="button"
-                  onClick={() => handleClickStartButton()}
-                  className="px-6 py-3 rounded-lg transition-colors bg-blue-500 hover:enabled:bg-blue-600 text-white disabled:bg-gray-400 disabled:text-gray-300 disabled:cursor-not-allowed"
-                >
-                  始める
-                </button>
-                {!isRecording && (
-                  <p className="text-gray-500 text-xs">音声を有効にすると開始できます。</p>
-                )}
-              </div>
-            </WelcomeOverlay>
-          )}
-          <div className="main-app-area">
-            <video
-              className={cn("stream", {
-                hidden: !videoRef.current || !videoStream,
-              })}
-              ref={videoRef}
-              autoPlay
-              playsInline
-            />
-          </div>
-          <ControlTray
-            videoRef={videoRef as React.RefObject<HTMLVideoElement>}
-            supportsVideo={true}
-            onVideoStreamChange={setVideoStream}
-          />
-        </main>
+        <ModelContainer />
+        <ControlTray
+          videoRef={videoRef as React.RefObject<HTMLVideoElement>}
+          supportsVideo={true}
+          onVideoStreamChange={setVideoStream}
+        />
+        {!isStarted && (
+          <WelcomeOverlay className="fixed inset-0">
+            <div className="space-y-2">
+              <button
+                disabled={userDataLoading || !isRecording}
+                type="button"
+                onClick={() => handleClickStartButton()}
+                className="px-6 py-3 rounded-lg transition-colors bg-blue-500 hover:enabled:bg-blue-600 text-white disabled:bg-gray-400 disabled:text-gray-300 disabled:cursor-not-allowed"
+              >
+                始める
+              </button>
+              {!isRecording && (
+                <p className="text-gray-500 text-xs">音声を有効にすると開始できます。</p>
+              )}
+            </div>
+          </WelcomeOverlay>
+        )}
+        {isDev && <SidePanel className="absolute left-0 h-full" />}
       </div>
     </div>
   );
