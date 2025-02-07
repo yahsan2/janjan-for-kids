@@ -4,7 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
-import { type ExpressionKey } from "../contexts/ExpressionContext";
+import type { ExpressionKey } from "../contexts/ExpressionContext";
 
 interface ModelViewerProps {
   className: string;
@@ -15,28 +15,28 @@ interface ModelViewerProps {
 const INITIAL_CAMERA_POSITION = {
   x: 4,
   y: 0.5,
-  z: 2
+  z: 2,
 };
 
 // カメラの初期ズーム設定を定数として定義
 const INITIAL_CAMERA_ZOOM = {
   min: 1,
   max: 10,
-  current: 2.2
+  current: 2.2,
 };
 
 // モデルの初期スケール設定を定数として定義
 const INITIAL_MODEL_SCALE = {
   x: 0.02,
   y: 0.02,
-  z: 0.02
+  z: 0.02,
 };
 
 // モデルの初期位置を定数として定義
 const INITIAL_MODEL_POSITION = {
   x: 1,
   y: -0.8,
-  z: 0
+  z: 0,
 };
 
 export function ModelViewer({ className, expression }: ModelViewerProps) {
@@ -53,11 +53,11 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
   const isSadRef = useRef<boolean>(false);
 
   // カメラの現在の相対位置を保持する参照
-  const cameraOffsetRef = useRef({x: 0, y: 0, z: 0});
+  const cameraOffsetRef = useRef({ x: 0, y: 0, z: 0 });
   // モデルの現在の相対スケールを保持する参照
-  const modelScaleRef = useRef({x: 0, y: 0, z: 0});
+  const modelScaleRef = useRef({ x: 0, y: 0, z: 0 });
   // モデルの現在の相対位置を保持する参照
-  const modelPositionRef = useRef({x: 0, y: 0, z: 0});
+  const modelPositionRef = useRef({ x: 0, y: 0, z: 0 });
 
   // モデルの表情を更新する関数
   const updateModelExpression = (model: THREE.Group, expression: ExpressionKey | null) => {
@@ -131,11 +131,7 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
           INITIAL_MODEL_POSITION.y,
           INITIAL_MODEL_POSITION.z
         );
-        model.scale.set(
-          INITIAL_MODEL_SCALE.x,
-          INITIAL_MODEL_SCALE.y,
-          INITIAL_MODEL_SCALE.z
-        );
+        model.scale.set(INITIAL_MODEL_SCALE.x, INITIAL_MODEL_SCALE.y, INITIAL_MODEL_SCALE.z);
         break;
     }
   };
@@ -163,7 +159,7 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
 
     const renderer = new THREE.WebGLRenderer({
       canvas: canvasRef.current,
-      antialias: true
+      antialias: true,
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -212,11 +208,7 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
         modelRef.current = object;
 
         // モデルのスケールと位置を調整
-        object.scale.set(
-          INITIAL_MODEL_SCALE.x,
-          INITIAL_MODEL_SCALE.y,
-          INITIAL_MODEL_SCALE.z
-        );
+        object.scale.set(INITIAL_MODEL_SCALE.x, INITIAL_MODEL_SCALE.y, INITIAL_MODEL_SCALE.z);
         object.position.set(
           INITIAL_MODEL_POSITION.x,
           INITIAL_MODEL_POSITION.y,
