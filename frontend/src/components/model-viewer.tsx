@@ -13,16 +13,16 @@ interface ModelViewerProps {
 
 // カメラの初期位置を定数として定義
 const INITIAL_CAMERA_POSITION = {
-  x: 4,
-  y: 0.5,
-  z: 2,
+  x: 0,
+  y: 1,
+  z: 5,
 };
 
 // カメラの初期ズーム設定を定数として定義
 const INITIAL_CAMERA_ZOOM = {
   min: 1,
   max: 10,
-  current: 2.2,
+  current: 1,
 };
 
 // モデルの初期スケール設定を定数として定義
@@ -34,11 +34,16 @@ const INITIAL_MODEL_SCALE = {
 
 // モデルの初期位置を定数として定義
 const INITIAL_MODEL_POSITION = {
-  x: 1,
-  y: -0.8,
+  x: 2,
+  y: -0.75,
+  z: 2,
+};
+// モデルの初期の向き
+const INITIAL_MODEL_ROTATION = {
+  x: 0,
+  y: (-1 * Math.PI) / 4,
   z: 0,
 };
-
 export function ModelViewer({ className, expression }: ModelViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -125,7 +130,11 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
         break;
       default:
         // neutral, noface, error, nullの場合は初期状態に戻す
-        model.rotation.set(0, Math.PI / 4, 0);
+        model.rotation.set(
+          INITIAL_MODEL_ROTATION.x,
+          INITIAL_MODEL_ROTATION.y,
+          INITIAL_MODEL_ROTATION.z
+        );
         model.position.set(
           INITIAL_MODEL_POSITION.x,
           INITIAL_MODEL_POSITION.y,
@@ -214,7 +223,12 @@ export function ModelViewer({ className, expression }: ModelViewerProps) {
           INITIAL_MODEL_POSITION.y,
           INITIAL_MODEL_POSITION.z
         );
-        object.rotation.y = Math.PI / 4;
+
+        object.rotation.set(
+          INITIAL_MODEL_ROTATION.x,
+          INITIAL_MODEL_ROTATION.y,
+          INITIAL_MODEL_ROTATION.z
+        );
 
         scene.add(object);
 
