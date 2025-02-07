@@ -31,11 +31,10 @@ import { useMathQuestions } from "./hooks/use-math-questions";
 
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const { isRecording } = useAudio();
   const { isDev } = useConfig();
   const { user, getIdToken, signInAnonymousUser } = useAuth();
-  const { userData, loading: userDataLoading } = useFirestore(user?.uid);
+  const { loading: userDataLoading } = useFirestore(user?.uid);
   const { mathQuestions } = useMathQuestions();
 
   const [isStarted, setIsStarted] = useState(false);
@@ -68,13 +67,15 @@ function App() {
     },
   });
 
+  console.log(mathQuestions[0]);
+
   const handleClickStartButton = async () => {
     if (!user?.uid || connected) return;
 
-    const idToken = await getIdToken();
-    await connect(idToken);
+    // const idToken = await getIdToken();
+    // await connect(idToken);
 
-    client.send([{ text: "こんにちは！算数のお勉強をしましょう！" }]);
+    // client.send([{ text: "こんにちは！算数のお勉強をしましょう！" }]);
     setIsStarted(true);
   };
 
@@ -85,7 +86,6 @@ function App() {
         <ControlTray
           videoRef={videoRef as React.RefObject<HTMLVideoElement>}
           supportsVideo={true}
-          onVideoStreamChange={setVideoStream}
         />
         {isStarted && mathQuestions[0] && (
           <div className="fixed inset-0">
@@ -124,7 +124,7 @@ function AppProvider() {
   useEffect(() => {
     // 初回マウント時に匿名ログインを実行
     signInAnonymousUser();
-  }, []);
+  }, [signInAnonymousUser]);
 
   return (
     <LiveAPIProvider url={wsUrl} userId={user?.uid}>
