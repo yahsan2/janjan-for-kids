@@ -46,6 +46,11 @@ def get_user_data(user_id: str) -> Dict[str, any]:
         for doc in question_docs:
             question_data = doc.to_dict()
             question_data['id'] = doc.id
+            # Convert timestamps to ISO format strings
+            if 'createdAt' in question_data:
+                question_data['createdAt'] = question_data['createdAt'].isoformat()
+            if 'updatedAt' in question_data:
+                question_data['updatedAt'] = question_data['updatedAt'].isoformat()
             questions.append(question_data)
 
         return {
@@ -110,7 +115,19 @@ def add_math_question(user_id: str, question_text: str, formula: str, answer: st
         'updatedAt': firestore.SERVER_TIMESTAMP,
     }
     doc_ref.set(data)
+
+    # Get the document to retrieve the server timestamps
+    doc = doc_ref.get()
+    data = doc.to_dict()
     data['id'] = doc_ref.id
+
+    # Convert timestamps to ISO format strings
+    if 'createdAt' in data:
+        data['createdAt'] = data['createdAt'].isoformat()
+    if 'updatedAt' in data:
+        data['updatedAt'] = data['updatedAt'].isoformat()
+
+    print(data)
     return data
 
 def upsert_math_question_result(user_id: str, question_id: str, is_correct: bool, formula: str, question_text: str, answer: str, level: int) -> Dict[str, any]:
@@ -145,6 +162,16 @@ def upsert_math_question_result(user_id: str, question_id: str, is_correct: bool
             'updatedAt': firestore.SERVER_TIMESTAMP,
         }
         doc_ref.set(data)
+
+        # Get the document to retrieve the server timestamps
+        doc = doc_ref.get()
+        data = doc.to_dict()
+
+        # Convert timestamps to ISO format strings
+        if 'createdAt' in data:
+            data['createdAt'] = data['createdAt'].isoformat()
+        if 'updatedAt' in data:
+            data['updatedAt'] = data['updatedAt'].isoformat()
         return data
 
     # 既存の問題データを更新
@@ -157,6 +184,16 @@ def upsert_math_question_result(user_id: str, question_id: str, is_correct: bool
     data['updatedAt'] = firestore.SERVER_TIMESTAMP
 
     doc_ref.update(data)
+
+    # Get the updated document to retrieve the new timestamp
+    doc = doc_ref.get()
+    data = doc.to_dict()
+
+    # Convert timestamps to ISO format strings
+    if 'createdAt' in data:
+        data['createdAt'] = data['createdAt'].isoformat()
+    if 'updatedAt' in data:
+        data['updatedAt'] = data['updatedAt'].isoformat()
     return data
 
 def get_math_question_stats(user_id: str, question_id: str) -> Dict[str, any]:
