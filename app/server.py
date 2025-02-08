@@ -32,7 +32,12 @@ from websockets.exceptions import ConnectionClosedError
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://janjan-for-kids.web.app",
+        "https://janjan-for-kids-793388034611.us-central1.run.app"
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
