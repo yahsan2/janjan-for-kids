@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from app.tools.embedding import retrieve_docs
+# from app.tools.embedding import retrieve_docs
 from app.tools.firestore import add_math_question, get_user_data, set_user_name, upsert_math_question_result, get_math_question_stats, increment_user_level
 from app.templates import FORMAT_DOCS, SYSTEM_INSTRUCTION
 from google import genai
@@ -29,7 +29,7 @@ genai_client = genai.Client(
 )
 
 tool_functions = {
-    "retrieve_docs": retrieve_docs,
+    # "retrieve_docs": retrieve_docs,
     "get_user_data": get_user_data,
     "set_user_name": set_user_name,
     "upsert_math_question_result": upsert_math_question_result,
@@ -61,6 +61,10 @@ tools = [
             FunctionDeclaration.from_function(
                 client=genai_client,
                 func=upsert_math_question_result,
+            ),
+            FunctionDeclaration.from_function(
+                client=genai_client,
+                func=add_math_question,
             ),
             FunctionDeclaration.from_function(
                 client=genai_client,
