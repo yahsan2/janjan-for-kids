@@ -26,7 +26,7 @@ export function useConfig(): Config {
       wsUrl = "ws://localhost:8000/ws";
     } else {
       // 本番環境などの場合、プロダクション用のバックエンドURLを使用
-      wsUrl = "wss://janjan-for-kids-pijxwapxwq-uc.a.run.app/ws";
+      wsUrl = "wss://janjan-for-kids-793388034611.us-central1.run.app/ws";
     }
 
     return { wsUrl, isDev };
