@@ -46,11 +46,6 @@ def get_user_data(user_id: str) -> Dict[str, any]:
         for doc in question_docs:
             question_data = doc.to_dict()
             question_data['id'] = doc.id
-            # Convert timestamps to ISO format strings
-            if 'createdAt' in question_data:
-                question_data['createdAt'] = question_data['createdAt'].isoformat()
-            if 'updatedAt' in question_data:
-                question_data['updatedAt'] = question_data['updatedAt'].isoformat()
             questions.append(question_data)
 
         return {
@@ -120,13 +115,6 @@ def add_math_question(user_id: str, question_text: str, formula: str, answer: st
     doc = doc_ref.get()
     data = doc.to_dict()
     data['id'] = doc_ref.id
-
-    # Convert timestamps to ISO format strings
-    if 'createdAt' in data:
-        data['createdAt'] = data['createdAt'].isoformat()
-    if 'updatedAt' in data:
-        data['updatedAt'] = data['updatedAt'].isoformat()
-
     print(data)
     return data
 
