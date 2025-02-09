@@ -82,7 +82,7 @@ function App() {
         <ModelContainer />
         <ControlTray
           videoRef={videoRef as React.RefObject<HTMLVideoElement>}
-          supportsVideo={true}
+          supportsVideo={false}
         />
         <CurrentQuestion isStarted={isStarted} />
         {!isStarted && (

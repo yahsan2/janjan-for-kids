@@ -155,7 +155,7 @@ function ControlTray({
   };
 
   return (
-    <section className="control-tray opacity-0">
+    <section className="control-tray">
       <canvas style={{ display: "none" }} ref={renderCanvasRef} />
       <nav className={cn("actions-nav", { disabled: !connected })}>
         <button className={cn("action-button mic-button")} onClick={() => setMuted(!muted)}>
