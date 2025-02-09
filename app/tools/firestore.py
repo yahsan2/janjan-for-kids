@@ -46,6 +46,11 @@ def get_user_data(user_id: str) -> Dict[str, any]:
         for doc in question_docs:
             question_data = doc.to_dict()
             question_data['id'] = doc.id
+            # Remove timestamp fields
+            if 'createdAt' in question_data:
+                del question_data['createdAt']
+            if 'updatedAt' in question_data:
+                del question_data['updatedAt']
             questions.append(question_data)
 
         return {
@@ -115,6 +120,13 @@ def add_math_question(user_id: str, question_text: str, formula: str, answer: st
     doc = doc_ref.get()
     data = doc.to_dict()
     data['id'] = doc_ref.id
+
+    # Remove timestamp fields
+    if 'createdAt' in data:
+        del data['createdAt']
+    if 'updatedAt' in data:
+        del data['updatedAt']
+
     print(data)
     return data
 
@@ -155,11 +167,12 @@ def upsert_math_question_result(user_id: str, question_id: str, is_correct: bool
         doc = doc_ref.get()
         data = doc.to_dict()
 
-        # Convert timestamps to ISO format strings
+        # Remove timestamp fields
         if 'createdAt' in data:
-            data['createdAt'] = data['createdAt'].isoformat()
+            del data['createdAt']
         if 'updatedAt' in data:
-            data['updatedAt'] = data['updatedAt'].isoformat()
+            del data['updatedAt']
+
         return data
 
     # 既存の問題データを更新
