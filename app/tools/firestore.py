@@ -42,7 +42,10 @@ def get_user_data(user_id: str) -> Dict[str, any]:
 
         # 現在のレベルの問題を取得
         questions = []
-        question_docs = questions_ref.where('level', '==', current_level).get(transaction=transaction)
+        # 現在のレベルと1つ前のレベルの問題を取得
+        current_level_docs = questions_ref.where('level', '==', current_level).get(transaction=transaction)
+        previous_level_docs = questions_ref.where('level', '==', max(1, current_level - 1)).get(transaction=transaction)
+        question_docs = list(current_level_docs) + list(previous_level_docs)
         for doc in question_docs:
             question_data = doc.to_dict()
             question_data['id'] = doc.id
