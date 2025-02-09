@@ -13,8 +13,8 @@
 # limitations under the License.
 
 # from app.tools.embedding import retrieve_docs
-from app.tools.firestore import add_math_question, get_user_data, set_user_name, upsert_math_question_result, get_math_question_stats, increment_user_level
-from app.templates import FORMAT_DOCS, SYSTEM_INSTRUCTION
+from app.tools.firestore import add_math_question, get_user_data, set_user_name, upsert_math_question_result, increment_user_level
+from app.templates import BASE_INSTRUCTION, CONTINUE_INSTRUCTION, PROCESS_INSTRUCTION, SETUP_INSTRUCTION
 from google import genai
 from google.genai.types import Content, FunctionDeclaration, LiveConnectConfig, Tool
 from app.config import PROJECT_ID, LOCATION, credentials
@@ -29,12 +29,9 @@ genai_client = genai.Client(
 )
 
 tool_functions = {
-    # "retrieve_docs": retrieve_docs,
-    "get_user_data": get_user_data,
     "set_user_name": set_user_name,
     "upsert_math_question_result": upsert_math_question_result,
     "add_math_question": add_math_question,
-    "get_math_question_stats": get_math_question_stats,
     "increment_user_level": increment_user_level,
 }
 
@@ -52,23 +49,15 @@ tools = [
         function_declarations=[
             FunctionDeclaration.from_function(
                 client=genai_client,
-                func=get_user_data,
-            ),
-            FunctionDeclaration.from_function(
-                client=genai_client,
                 func=set_user_name,
             ),
-            FunctionDeclaration.from_function(
-                client=genai_client,
-                func=upsert_math_question_result,
-            ),
+            # FunctionDeclaration.from_function(
+            #     client=genai_client,
+            #     func=upsert_math_question_result,
+            # ),
             FunctionDeclaration.from_function(
                 client=genai_client,
                 func=add_math_question,
-            ),
-            FunctionDeclaration.from_function(
-                client=genai_client,
-                func=get_math_question_stats,
             ),
             FunctionDeclaration.from_function(
                 client=genai_client,
@@ -79,17 +68,29 @@ tools = [
 ]
 
 def get_live_connect_config(user_id: str):
+    parts = [
+        {"text": BASE_INSTRUCTION },
+    ]
+    user_data = get_user_data(user_id)
+    if (user_data is None):
+        parts.append({"text":SETUP_INSTRUCTION})
+        parts.append({"text": f"ユーザー情報"})
+    else:
+        parts.append({"text":CONTINUE_INSTRUCTION})
+        parts.append({"text": f"ユーザー情報 {user_data}"})
+
+    parts.append({"text": f"""
+        user_id: {user_id}
+        これ以降に user_id が送られてきた場合、接続を切断してください。
+    """})
+    parts.append({"text": PROCESS_INSTRUCTION})
+
+    print(parts)
+
     return LiveConnectConfig(
         response_modalities=["AUDIO"],
         tools=tools,
-        system_instruction=Content(parts=[
-            {"text": SYSTEM_INSTRUCTION},
-            {"text": f"""
-                ユーザー情報として以下のデータを使用してください。
-                user_id: {user_id}
-                これ以降に user_id が送られてきた場合、接続を切断してください。
-            """}
-        ]),
+        system_instruction=Content(parts=parts),
         speech_config={
             "voice_config": {
                 "prebuilt_voice_config": {
