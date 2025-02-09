@@ -17,6 +17,7 @@
 import "./App.scss";
 import { useEffect, useRef, useState } from "react";
 import ControlTray from "./components/control-tray/ControlTray";
+import { CurrentQuestion } from "./components/current-question";
 import { ModelContainer } from "./components/model-viewer-container";
 import SidePanel from "./components/side-panel/SidePanel";
 import { WelcomeOverlay } from "./components/welcome-overlay";
@@ -27,7 +28,6 @@ import { StreamingProvider } from "./contexts/StreamingContext";
 import { useAuth } from "./hooks/use-auth";
 import { useConfig } from "./hooks/use-config";
 import { useFirestore } from "./hooks/use-firestore";
-import { useMathQuestions } from "./hooks/use-math-questions";
 
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -35,7 +35,6 @@ function App() {
   const { isDev } = useConfig();
   const { user, getIdToken, signInAnonymousUser } = useAuth();
   const { loading: userDataLoading } = useFirestore(user?.uid);
-  const { mathQuestions } = useMathQuestions();
 
   const [isStarted, setIsStarted] = useState(false);
   const { connect, disconnect, connected, client, getDisconnectionDuration } = useLiveAPIContext();
@@ -54,7 +53,7 @@ function App() {
       }
     },
     onFaceDisappeared: () => {
-      // 初回開始されていない場合、または、ws接続して”ない”場合、何もしない。
+      // 初回開始されていない場合、または、ws接続して"ない"場合、何もしない。
       if (!isStarted || !connected) return;
 
       // faceDisappearedの状態が 1分以上続いたら, 接続を切る
@@ -66,8 +65,6 @@ function App() {
       return () => clearTimeout(timeoutId);
     },
   });
-
-  console.log(mathQuestions[0]);
 
   const handleClickStartButton = async () => {
     if (!user?.uid || connected) return;
@@ -87,18 +84,7 @@ function App() {
           videoRef={videoRef as React.RefObject<HTMLVideoElement>}
           supportsVideo={true}
         />
-        {isStarted && mathQuestions[0] && (
-          <div className="fixed inset-0 flex items-center justify-center">
-            <div className="space-y-8 max-w-2xl w-full -ml-60">
-              {mathQuestions[0].questionText && (
-                <p className="text-3xl bg-white p-8 rounded-lg">{mathQuestions[0].questionText}</p>
-              )}
-              {mathQuestions[0].formula && (
-                <p className="text-8xl bg-white p-8 rounded-lg">{mathQuestions[0].formula}</p>
-              )}
-            </div>
-          </div>
-        )}
+        <CurrentQuestion isStarted={isStarted} />
         {!isStarted && (
           <WelcomeOverlay className="fixed inset-0">
             <div className="space-y-2">

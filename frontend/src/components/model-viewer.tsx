@@ -292,6 +292,7 @@ export function ModelViewer({ className, expression, volume }: ModelViewerProps)
       }
       // volume が 0 の場合は他のアニメーションを適用
       else {
+        volumeRef.current = 0;
         // Happyの時の跳ねるアニメーション
         if (isHappyRef.current && modelRef.current) {
           timeRef.current += 0.05;
