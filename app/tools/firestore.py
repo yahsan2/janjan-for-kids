@@ -135,7 +135,7 @@ def upsert_math_question_result(user_id: str, question_id: str, is_correct: bool
     # 非同期で更新を実行し、レスポンスは先に返す
     async def update_question():
         doc_ref = db.collection('users').document(user_id).collection('mathQuestions').document(question_id)
-        doc = await doc_ref.get_async()
+        doc = doc_ref.get()
         if not doc.exists:
             return
         data = doc.to_dict()
@@ -145,7 +145,7 @@ def upsert_math_question_result(user_id: str, question_id: str, is_correct: bool
             data['wrongCount'] = data.get('wrongCount', 0) + 1
         data['updatedAt'] = firestore.SERVER_TIMESTAMP
 
-        await doc_ref.update_async(data)
+        doc_ref.update(data)
 
     asyncio.create_task(update_question())
     return

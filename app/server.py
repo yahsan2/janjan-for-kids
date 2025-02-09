@@ -127,7 +127,8 @@ class GeminiSession:
                 ]
             )
             logging.debug(f"Tool response: {tool_response}")
-            await session.send(tool_response)
+            # なぜかエラー。GETで tool functions 現在はないので、一旦コメントアウト
+            # await session.send(tool_response)
 
     async def receive_from_gemini(self) -> None:
         """Listen for and process messages from Gemini.

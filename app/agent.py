@@ -51,10 +51,10 @@ tools = [
                 client=genai_client,
                 func=set_user_name,
             ),
-            # FunctionDeclaration.from_function(
-            #     client=genai_client,
-            #     func=upsert_math_question_result,
-            # ),
+            FunctionDeclaration.from_function(
+                client=genai_client,
+                func=upsert_math_question_result,
+            ),
             FunctionDeclaration.from_function(
                 client=genai_client,
                 func=add_math_question,
