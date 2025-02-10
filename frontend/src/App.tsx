@@ -96,8 +96,15 @@ function App() {
               >
                 始める
               </button>
-              {!isRecording && (
+              {!isRecording ? (
                 <p className="text-gray-500 text-xs">音声を有効にすると開始できます。</p>
+              ) : (
+                <p className="text-gray-500 text-xs">
+                  「始める」の後、会話開始まで数秒かかることがあります。しばらくお待ちください。
+                  <br />
+                  それでも繋がらない場合、現在利用の実験的モデルが、 <br />
+                  同時接続数が 3 となっているため、時間をおいて再度お試しください。
+                </p>
               )}
             </div>
           </WelcomeOverlay>
