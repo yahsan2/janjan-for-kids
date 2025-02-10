@@ -1,5 +1,5 @@
 # JanJan for kids
-![web demo](https://janjan-for-kids.web.app)
+[web demo](https://janjan-for-kids.web.app)
 
 #### Backend Setup
 1. **Set your default Google Cloud project and region:**
