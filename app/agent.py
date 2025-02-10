@@ -85,8 +85,6 @@ def get_live_connect_config(user_id: str):
     """})
     parts.append({"text": PROCESS_INSTRUCTION})
 
-    print(parts)
-
     return LiveConnectConfig(
         response_modalities=["AUDIO"],
         tools=tools,
