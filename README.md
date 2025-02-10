@@ -1,6 +1,9 @@
 # JanJan for kids
 [web demo](https://janjan-for-kids.web.app)
 
+開始ボタンを押してから、会話までに最初時間がかかる場合があります。
+またMultimodal Live API の同時接続数制限が3なので、動かない場合はこちらになっている可能性があります。
+
 #### Backend Setup
 1. **Set your default Google Cloud project and region:**
    ```bash
